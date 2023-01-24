@@ -39,7 +39,7 @@ def get_2d_connectivity(nx, ny):
     return icon, plt
 
 
-x, p = get_2d_connectivity(5, 6)
+x, p = get_2d_connectivity(3, 2)
 print(x)
 p.show()
 

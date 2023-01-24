@@ -75,9 +75,9 @@ def init_gauss_points(n=3):
 
 def init_stiffness_force(nnod, DOF):
     """
-    :param nnod:
-    :param DOF:
-    :return zero force vector:
+    :param nnod: number of nodes
+    :param DOF: Dof
+    :return: zero stiffness n force
     """
     return np.zeros((nnod * DOF, nnod * DOF)), np.zeros((nnod * DOF, 1))
 
@@ -114,6 +114,8 @@ def get_lagrange_fn(gp, J, element_type=2):
     :param element_type: element_type 2=LINEAR
     :return: (L,L")
     """
+    if element_type != 2:
+        raise Exception("Uhm, This is wendy's, we don't, more than 3 gauss points here")
     Nmat = np.array([.5 * (-gp + 1), .5 * (1 + gp)])
     Bmat = np.array((1 / J) * [-.5, .5])
     return Nmat, Bmat
