@@ -104,7 +104,7 @@ def get_hermite_fn(gp, J):
     Nmat = np.array([.25 * (gp + 2) * (1 - gp) ** 2, J * .25 * (gp + 1) * (1 - gp) ** 2,
                      .25 * (-gp + 2) * (1 + gp) ** 2, J * .25 * (gp - 1) * (1 + gp) ** 2])
     Bmat = (1 / J ** 2) * np.array([1.5 * gp, (-.5 + 1.5 * gp) * J, -1.5 * gp, (.5 + 1.5 * gp) * J])
-    return Nmat, Bmat
+    return Nmat.reshape(Nmat.shape[0], 1), Bmat.reshape(Bmat.shape[0], 1)
 
 
 def get_lagrange_fn(gp, J, element_type=2):
@@ -118,7 +118,7 @@ def get_lagrange_fn(gp, J, element_type=2):
         raise Exception("Uhm, This is wendy's, we don't, more than 3 gauss points here")
     Nmat = np.array([.5 * (-gp + 1), .5 * (1 + gp)])
     Bmat = np.array((1 / J) * [-.5, .5])
-    return Nmat, Bmat
+    return Nmat.reshape(Nmat.shape[0], 1), Bmat.reshape(Bmat.shape[0], 1)
 
 
 def impose_boundary_condition(K, f, ibc, bc):
