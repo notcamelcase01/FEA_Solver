@@ -3,11 +3,12 @@ import solver1d as sol
 import matplotlib.pyplot as plt
 from parameters import E, b, f0, L, F, k, G
 import keywords as param
+
 plt.style.use('dark_background')
 '''
 Define 1D FEA Model
 '''
-numberOfElements = 11
+numberOfElements = 20
 DOF = 3
 qx = L
 element_type = param.ElementType.QUAD
@@ -38,11 +39,14 @@ for elm in range(numberOfElements):
         Kwt = k * G * A * np.outer(Bmat, Nmat) * Jacobian * weightOfGaussPts[igp]
         Ktt = (E * Moi * np.outer(Bmat, Bmat) + k * G * A * np.outer(Nmat, Nmat)) * Jacobian * weightOfGaussPts[igp]
         kloc += sol.get_timoshenko_stiffness(Kuu, Kww, Kwt, Ktt, element_type)
-        # print(Nmat.shape)
-        # print(floc.shape)
         # floc += -Nmat * f0 * Jacobian * weightOfGaussPts[igp]
+        ft = Nmat * f0 * Jacobian * weightOfGaussPts[igp]
+        fa = Nmat * 0 * Jacobian * weightOfGaussPts[igp]
+        m = Bmat * 0 * Jacobian * weightOfGaussPts[igp]
+        floc += sol.get_timoshenko_force(ft, fa, m, element_type)
+
     iv = sol.get_assembly_vector(DOF, n)
-    # fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
+    fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
@@ -56,12 +60,12 @@ ad = []
 td = []
 theta = []
 for i in range(numberOfNodes):
-    ad.append(u[3*i][0])
-    td.append(u[3*i + 1][0])
-    theta.append(u[3*i + 2][0])
+    ad.append(u[3 * i][0])
+    td.append(u[3 * i + 1][0])
+    theta.append(u[3 * i + 2][0])
 fig, ax1 = plt.subplots(1, 1, figsize=(10, 5))
 ax1.plot(x, td, marker="o", label="transverse displacement")
-ax1.set_xlabel("Displacement at x = {L}m : {ttt}m".format(L=L, ttt= td[-1]))
+ax1.set_xlabel("Displacement at x = {L}m : {ttt}m".format(L=L, ttt=td[-1]))
 ax1.legend()
 print(td[-1])
 plt.show()

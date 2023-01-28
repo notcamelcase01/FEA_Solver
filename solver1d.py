@@ -27,7 +27,6 @@ def assemble_force(floc, iv, n):
     :param n: DOF*number of nodes
     :return: force vector to be added to global force vector
     """
-    # TODO : Make this to assemble timeshenko forces
     K = np.zeros((n, 1))
     for i in range(len(iv)):
         K[iv[i]] = floc[i]
@@ -57,9 +56,9 @@ def get_connectivity_matrix(nelm, element_type):
             icon[i, 1] = 1 + i
     elif element_type == param.ElementType.QUAD:
         for i in range(nelm):
-            icon[i, 0] = 2*i
-            icon[i, 1] = 1 + 2*i
-            icon[i, 2] = 2 + 2*i
+            icon[i, 0] = 2 * i
+            icon[i, 1] = 1 + 2 * i
+            icon[i, 2] = 2 + 2 * i
     else:
         raise Exception("Uhm, This is wendy's, we don't, cubic element that here")
     return icon
@@ -160,6 +159,7 @@ def get_displacement_vector(K, f):
     :param f: force vector
     :return: nodal displacement
     """
+    # TODO : Do with without taking inverse
     try:
         return np.linalg.inv(K).dot(f)
     except np.linalg.LinAlgError as e:
@@ -199,9 +199,24 @@ def get_timoshenko_stiffness(Kuu, Kww, Kwt, Ktt, element_type):
             kloc = np.array([[Kuu[i][j], 0, 0],
                              [0, Kww[i][j], Kwt[i][j]],
                              [0, Kwt[j][i], Ktt[i][j]]])
-            iv = get_assembly_vector(1, np.arange(3*i, 3*i+3, 1, dtype=np.int32))
-            v = get_assembly_vector(1, np.arange(3*j, 3*j+3, 1, dtype=np.int32))
+            iv = get_assembly_vector(1, np.arange(3 * i, 3 * i + 3, 1, dtype=np.int32))
+            v = get_assembly_vector(1, np.arange(3 * j, 3 * j + 3, 1, dtype=np.int32))
             st += assemble_stiffness(kloc, iv, element_type * 3, v)
     return st
 
-# TODO : Make a function to assemble timeshekno forces
+
+def get_timoshenko_force(ft, fa, m, element_type):
+    """
+    DOF is assumed to be 3 for timoshenko beam
+    :param ft: transverse body force
+    :param fa: axial body force
+    :param m: body momentum
+    :param element_type: element type
+    :return: assembled force vector
+    """
+    stf = np.zeros((element_type*3, 1))
+    for i in range(element_type):
+        stf[3 * i, 0] = fa[i]
+        stf[3 * i + 1, 0] = ft[i]
+        stf[3 * i + 2, 0] = m[i]
+    return stf
