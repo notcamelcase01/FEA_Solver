@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def get_2d_connectivity(nx, ny):
     """
     :param nx: no. of elements along width
