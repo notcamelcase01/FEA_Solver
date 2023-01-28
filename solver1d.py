@@ -220,3 +220,15 @@ def get_timoshenko_force(ft, fa, m, element_type):
         stf[3 * i + 1, 0] = ft[i]
         stf[3 * i + 2, 0] = m[i]
     return stf
+
+
+def get_nodal_displacement(u, iv):
+    """
+    :param u: displacement vector
+    :param iv: assembly vector
+    :return: nodal displacement
+    """
+    uloc = np.zeros((len(iv), 1))
+    for i in range(len(iv)):
+        uloc[i] = u[iv[i]]
+    return uloc

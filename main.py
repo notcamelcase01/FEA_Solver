@@ -53,6 +53,9 @@ KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 2, 0)
 u = sol.get_displacement_vector(KG, fg)
+
+
+
 '''
 Post-processing
 '''
@@ -63,9 +66,25 @@ for i in range(numberOfNodes):
     ad.append(u[3 * i][0])
     td.append(u[3 * i + 1][0])
     theta.append(u[3 * i + 2][0])
+
+for elm in range(numberOfElements):
+    n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
+    xloc = []
+    for i in range(len(n)):
+        xloc.append(x[n[i]])
+    le = xloc[-1] - xloc[0]
+    uloc = sol.get_nodal_displacement(td, n)
+    if xloc[0] <= qx <= xloc[-1]:
+        gp = -1 + 2 * (qx - xloc[0])/le
+        Nmat, Bmat = sol.get_lagrange_fn(gp, le/2, element_type)
+        red_d = np.dot(Nmat.T, uloc)[0][0]
+        print(red_d)
+        break
+
 fig, ax1 = plt.subplots(1, 1, figsize=(10, 5))
 ax1.plot(x, td, marker="o", label="transverse displacement")
-ax1.set_xlabel("Displacement at x = {L}m : {ttt}m".format(L=L, ttt=td[-1]))
+ax1.set_xlabel("Length")
+ax1.set_ylabel("Transverse Displacement")
+ax1.set_title("Displacement at x = {L}m : {ttt}m".format(L=qx, ttt=red_d))
 ax1.legend()
-print(td[-1])
 plt.show()
