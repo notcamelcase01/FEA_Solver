@@ -11,7 +11,7 @@ Define 1D FEA Model
 numberOfElements = 20
 DOF = 3
 qx = L
-element_type = param.ElementType.QUAD
+element_type = param.ElementType.LINEAR
 OVERRIDE_REDUCED_INTEGRATION = False
 GAUSS_POINTS_REQ = 3
 numberOfNodes = (element_type - 1) * numberOfElements + 1
