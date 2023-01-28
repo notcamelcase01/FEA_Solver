@@ -126,7 +126,7 @@ def get_lagrange_fn(gp, J, element_type):
     """
     # TODO: use loop instead of if statements
     if element_type == param.ElementType.LINEAR:
-        Nmat = np.array([.5 * (-gp + 1), .5 * (1 + gp)])
+        Nmat = np.array([.5 * (1 - gp), .5 * (1 + gp)])
         Bmat = (1 / J) * np.array([-.5, .5])
     elif element_type == param.ElementType.QUAD:
         Nmat = np.array([0.5 * (-1 + gp) * gp, (-gp + 1) * (gp + 1), 0.5 * gp * (1 + gp)])
