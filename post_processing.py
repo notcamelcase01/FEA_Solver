@@ -1,3 +1,7 @@
+"""
+IGNORE THIS FILE ITS GONNA BE SPAGATTI CODE
+"""
+
 import numpy as np
 
 def f1(e):

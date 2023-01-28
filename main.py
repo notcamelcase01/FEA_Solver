@@ -3,11 +3,11 @@ import solver1d as sol
 import matplotlib.pyplot as plt
 from parameters import E, b, f0, L, F, k, G
 import keywords as param
-
+plt.style.use('dark_background')
 '''
 Define 1D FEA Model
 '''
-numberOfElements = 200
+numberOfElements = 11
 DOF = 3
 qx = L
 element_type = param.ElementType.QUAD
@@ -45,12 +45,10 @@ for elm in range(numberOfElements):
     # fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
-print(np.linalg.det(KG))
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 2, 0)
 u = sol.get_displacement_vector(KG, fg)
-print(u)
 '''
 Post-processing
 '''
@@ -62,5 +60,8 @@ for i in range(numberOfNodes):
     td.append(u[3*i + 1][0])
     theta.append(u[3*i + 2][0])
 fig, ax1 = plt.subplots(1, 1, figsize=(10, 5))
-ax1.plot(x, td)
+ax1.plot(x, td, marker="o", label="transverse displacement")
+ax1.set_xlabel("Displacement at x = {L}m : {ttt}m".format(L=L, ttt= td[-1]))
+ax1.legend()
+print(td[-1])
 plt.show()

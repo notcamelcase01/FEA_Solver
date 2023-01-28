@@ -27,6 +27,7 @@ def assemble_force(floc, iv, n):
     :param n: DOF*number of nodes
     :return: force vector to be added to global force vector
     """
+    # TODO : Make this to assemble timeshenko forces
     K = np.zeros((n, 1))
     for i in range(len(iv)):
         K[iv[i]] = floc[i]
@@ -203,3 +204,4 @@ def get_timoshenko_stiffness(Kuu, Kww, Kwt, Ktt, element_type):
             st += assemble_stiffness(kloc, iv, element_type * 3, v)
     return st
 
+# TODO : Make a function to assemble timeshekno forces
