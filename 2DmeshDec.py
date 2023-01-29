@@ -33,7 +33,7 @@ def get_2d_connectivity(nx, ny):
         ax1.text(node_array[1][icon[i][1]] + 1, node_array[2][icon[i][1]] + 1, str(icon[i][0]),
                  fontsize=12, color="blue")
     ax1.axis("equal")
-    ax1.set_xlabel("Elements in blue , nodes in white")
+    ax1.set_xlabel("Elements in blue, nodes in white")
     ax1.set_title(str(nx) + "x" + str(ny) + " mesh with " + str(nnod) + " nodes")
     columns = ("Element", "#1", "#2", "#3", "#4")
     ax2.table(cellText=icon, colLabels=columns, loc="center")

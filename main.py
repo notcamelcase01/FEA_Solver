@@ -46,10 +46,9 @@ for elm in range(numberOfElements):
         A = b * h
         Kuu += E * A * np.outer(Bmat, Bmat) * Jacobian * weightOfGaussPts[igp]
         Ktt += (E * Moi * np.outer(Bmat, Bmat)) * Jacobian * weightOfGaussPts[igp]
-        # floc += -Nmat * f0 * Jacobian * weightOfGaussPts[igp]
         ft = Nmat * f0 * Jacobian * weightOfGaussPts[igp]
-        fa = Nmat * 0 * Jacobian * weightOfGaussPts[igp]
-        m = Bmat * 0 * Jacobian * weightOfGaussPts[igp]
+        fa = Nmat * f0 * Jacobian * weightOfGaussPts[igp]
+        m = Bmat * f0 * Jacobian * weightOfGaussPts[igp]
         floc += sol.get_timoshenko_force(ft, fa, m, element_type)
     """
     REDUCED INTEGRATION LOOP
@@ -68,6 +67,7 @@ for elm in range(numberOfElements):
     fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
+
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 2, 0)
@@ -84,6 +84,7 @@ for i in range(numberOfNodes):
     td.append(u[3 * i + 1][0])
     theta.append(u[3 * i + 2][0])
 print(u[-2])
+red_d = "Invalid query length"
 for elm in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
     xloc = []
