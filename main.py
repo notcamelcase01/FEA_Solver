@@ -44,8 +44,8 @@ for elm in range(numberOfElements):
         h = (.01 - .005 * xx)
         Moi = b * h ** 3 / 12
         A = b * h
-        Kuu += E * A * np.outer(Bmat, Bmat) * Jacobian * weightOfGaussPts[igp]
-        Ktt += (E * Moi * np.outer(Bmat, Bmat)) * Jacobian * weightOfGaussPts[igp]
+        Kuu += E * A * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
+        Ktt += E * Moi * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
         ft = Nmat * f0 * Jacobian * weightOfGaussPts[igp]
         fa = Nmat * f0 * Jacobian * weightOfGaussPts[igp]
         m = Bmat * f0 * Jacobian * weightOfGaussPts[igp]
@@ -59,9 +59,9 @@ for elm in range(numberOfElements):
         h = (.01 - .005 * xx)
         Moi = b * h ** 3 / 12
         A = b * h
-        Kww += k * G * A * np.outer(Bmat, Bmat) * Jacobian * reduced_wts[igp]
-        Kwt += k * G * A * np.outer(Bmat, Nmat) * Jacobian * reduced_wts[igp]
-        Ktt += (k * G * A * np.outer(Nmat, Nmat)) * Jacobian * reduced_wts[igp]
+        Kww += k * G * A * Bmat @ Bmat.T * Jacobian * reduced_wts[igp]
+        Kwt += k * G * A * Bmat @ Nmat.T * Jacobian * reduced_wts[igp]
+        Ktt += k * G * A * Nmat @ Nmat.T * Jacobian * reduced_wts[igp]
     kloc = sol.get_timoshenko_stiffness(Kuu, Kww, Kwt, Ktt, element_type)
     iv = sol.get_assembly_vector(DOF, n)
     fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
@@ -95,7 +95,7 @@ for elm in range(numberOfElements):
     if xloc[0] <= qx <= xloc[-1]:
         gp = -1 + 2 * (qx - xloc[0]) / le
         Nmat, Bmat = sol.get_lagrange_fn(gp, le / 2, element_type)
-        red_d = np.dot(Nmat.T, uloc)[0][0]
+        red_d = (Nmat.T @ uloc)[0][0]
         print(red_d)
         break
 fig, ax1 = plt.subplots(1, 1, figsize=(10, 5))

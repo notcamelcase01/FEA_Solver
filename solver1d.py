@@ -161,7 +161,7 @@ def get_displacement_vector(K, f):
     """
     # TODO : Do with without taking inverse
     try:
-        return np.linalg.inv(K).dot(f)
+        return np.linalg.inv(K) @ f
     except np.linalg.LinAlgError as e:
         if 'Singular matrix' in str(e):
             print("STOP INTING")

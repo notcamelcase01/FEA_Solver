@@ -30,7 +30,6 @@ def f8(e):
 
 def f9(e):
     return 1, 1/np.sqrt(e) - 1/2, - 1/np.sqrt(e) - 1/2
-e = .001
-print(f9(e))
+e = .0001
+print(f7(e))
 
-print(12/(30000000*.01**4))
