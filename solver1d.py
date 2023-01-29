@@ -122,7 +122,7 @@ def get_lagrange_fn(gp, J, element_type):
     :param gp: gauss point
     :param J: jacobian
     :param element_type: element_type 2=LINEAR
-    :return: (L,L")
+    :return: (L,L')
     """
     # TODO: use loop instead of if statements
     if element_type == param.ElementType.LINEAR:
