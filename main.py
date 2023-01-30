@@ -14,15 +14,17 @@ qx = L
 element_type = param.ElementType.LINEAR
 OVERRIDE_REDUCED_INTEGRATION = False
 GAUSS_POINTS_REQ = 3
+REQUESTED_NODES = [0, 1]
+
 numberOfNodes = (element_type - 1) * numberOfElements + 1
-x = sol.get_node_points_coords(numberOfNodes, L)
+x = sol.get_node_points_coords(numberOfNodes, L, REQUESTED_NODES)
 connectivityMatrix = sol.get_connectivity_matrix(numberOfElements, element_type)
 weightOfGaussPts, gaussPts = sol.init_gauss_points(3)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and
                                                         element_type == param.ElementType.LINEAR) else GAUSS_POINTS_REQ)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
 fg[-2] = F
-
+f1 = f0
 for elm in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
     xloc = []
@@ -35,6 +37,10 @@ for elm in range(numberOfElements):
     Kwt = np.zeros((element_type, element_type))
     Ktt = np.zeros((element_type, element_type))
     kloc, floc = sol.init_stiffness_force(element_type, DOF)
+    # if .25 * L <= xloc[0] and xloc[-1] <= .75 * L:
+    #     f1 = f0
+    # else:
+    #     f1 = 0
     """
     FULL INTEGRATION LOOP
     """
@@ -46,9 +52,9 @@ for elm in range(numberOfElements):
         A = b * h
         Kuu += E * A * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
         Ktt += E * Moi * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
-        ft = Nmat * f0 * Jacobian * weightOfGaussPts[igp]
-        fa = Nmat * f0 * Jacobian * weightOfGaussPts[igp]
-        m = Bmat * f0 * Jacobian * weightOfGaussPts[igp]
+        ft = Nmat * f1 * Jacobian * weightOfGaussPts[igp]
+        fa = Nmat * 0 * Jacobian * weightOfGaussPts[igp]
+        m = Bmat * 0 * Jacobian * weightOfGaussPts[igp]
         floc += sol.get_timoshenko_force(ft, fa, m, element_type)
     """
     REDUCED INTEGRATION LOOP

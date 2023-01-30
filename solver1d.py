@@ -33,13 +33,24 @@ def assemble_force(floc, iv, n):
     return K
 
 
-def get_node_points_coords(n, length):
+def get_node_points_coords(n, length, reqn=(0, 1)):
     """
+    :param reqn: Requested lengths you want Nodes
     :param n: number of nodes
     :param length: length
     :return: node coordinates
     """
-    return np.linspace(0, length, n)
+    x = np.array([])
+    number_of_div = len(reqn) - 1
+    rem = n % number_of_div
+    exact_div = []
+    for _ in range(number_of_div):
+        exact_div.append(n//number_of_div)
+    exact_div[-1] += rem - 1
+    for i in range(number_of_div):
+        x = np.hstack((x, np.linspace(length * reqn[i], length * reqn[i+1], exact_div[i], endpoint=False)))
+    x = np.append(x, reqn[-1]*length)
+    return x
 
 
 def get_connectivity_matrix(nelm, element_type):
