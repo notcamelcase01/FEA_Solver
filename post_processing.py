@@ -31,5 +31,4 @@ def f8(e):
 def f9(e):
     return 1, 1/np.sqrt(e) - 1/2, - 1/np.sqrt(e) - 1/2
 e = .0001
-print(f7(e))
 

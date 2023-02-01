@@ -125,7 +125,7 @@ def get_hermite_fn(gp, J):
     Nmat = np.array([.25 * (gp + 2) * (1 - gp) ** 2, J * .25 * (gp + 1) * (1 - gp) ** 2,
                      .25 * (-gp + 2) * (1 + gp) ** 2, J * .25 * (gp - 1) * (1 + gp) ** 2])
     Bmat = (1 / J ** 2) * np.array([1.5 * gp, (-.5 + 1.5 * gp) * J, -1.5 * gp, (.5 + 1.5 * gp) * J])
-    return Nmat.reshape(Nmat.shape[0], 1), Bmat.reshape(Bmat.shape[0], 1)
+    return Nmat[:, None], Bmat[:, None]
 
 
 def get_lagrange_fn(gp, J, element_type):
@@ -145,7 +145,7 @@ def get_lagrange_fn(gp, J, element_type):
     else:
         raise Exception("Uhm, This is wendy's, we don't, more than 3 node points here")
 
-    return Nmat.reshape(Nmat.shape[0], 1), Bmat.reshape(Bmat.shape[0], 1)
+    return Nmat[:, None], Bmat[:, None]
 
 
 def impose_boundary_condition(K, f, ibc, bc):
@@ -156,7 +156,7 @@ def impose_boundary_condition(K, f, ibc, bc):
     :param bc: boundary condition
     :return: stiffness matrix and force vector after imposed bc
     """
-    f = f - (K[:, ibc] * bc).reshape((len(f), 1))
+    f = f - (K[:, ibc] * bc)[:, None]
     f[ibc] = bc
     K[:, ibc] = 0
     K[ibc, :] = 0
@@ -277,13 +277,33 @@ def get_body_force(start, stop, xloc, f):
     :return: effective force
     """
     # TODO : Reduce if statements
-    if f == 0:
-        return 0
+    if f == (0, 0, 0):
+        return f
     le = xloc[-1] - xloc[0]
     if start <= xloc[0] and xloc[-1] <= stop:
         return f
     if xloc[0] <= start <= xloc[-1]:
-        return f * (xloc[-1] - start) / le
+        mult = ((xloc[-1] - start) if not stop < xloc[-1] else stop - start) / le
+        return f[0] * mult, f[1] * mult, f[2] * mult
     if xloc[0] <= stop <= xloc[-1]:
-        return -f * (xloc[0] - stop) / le
-    return 0
+        mult = -(xloc[0] - stop) / le
+        return f[0] * mult, f[1] * mult, f[2] * mult
+    return 0, 0, 0
+
+
+def get_point_force(p, xloc, f):
+    """
+    Get force at a node
+    :param p: point at with force is applied
+    :param xloc: local coord
+    :param f: force
+    :return: distributed force
+    """
+    if f == (0, 0, 0):
+        return np.zeros((len(xloc), 1)), np.zeros((len(xloc), 1)), np.zeros((len(xloc), 1))
+    le = xloc[-1] - xloc[0]
+    if xloc[0] <= p <= xloc[-1]:
+        gp = -1 + 2 * (p - xloc[0]) / le
+        Nmat, Bmat = get_lagrange_fn(gp, le/2, len(xloc))
+        return Nmat * f[0], Nmat * f[1], Nmat * f[2]
+    return np.zeros((len(xloc), 1)), np.zeros((len(xloc), 1)), np.zeros((len(xloc), 1))

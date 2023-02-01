@@ -19,7 +19,7 @@ def get_height(xp):
 numberOfElements = 20
 DOF = 3
 qx = L
-element_type = param.ElementType.QUAD
+element_type = param.ElementType.LINEAR
 OVERRIDE_REDUCED_INTEGRATION = False
 GAUSS_POINTS_REQ = 3
 REQUESTED_NODES = [0, 1]
@@ -30,7 +30,6 @@ weightOfGaussPts, gaussPts = sol.init_gauss_points(3)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and
                                                         element_type == param.ElementType.LINEAR) else GAUSS_POINTS_REQ)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
-fg[-2] = F
 for elm in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
     xloc = []
@@ -43,7 +42,9 @@ for elm in range(numberOfElements):
     Kwt = np.zeros((element_type, element_type))
     Ktt = np.zeros((element_type, element_type))
     kloc, floc = sol.init_stiffness_force(element_type, DOF)
-    f1 = sol.get_body_force(0, L, xloc, f0)
+    f1 = sol.get_body_force(.25 * L, .75 * L, xloc, f0)
+    Fa, Ft, Mm = sol.get_point_force(L, xloc, F)
+    floc += sol.get_timoshenko_force(Ft, Fa, Mm, element_type)
     """
     FULL INTEGRATION LOOP
     """
@@ -55,9 +56,9 @@ for elm in range(numberOfElements):
         A = b * h
         Kuu += E * A * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
         Ktt += E * Moi * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
-        ft = Nmat * f1 * Jacobian * weightOfGaussPts[igp]
-        fa = Nmat * 0 * Jacobian * weightOfGaussPts[igp]
-        m = Bmat * 0 * Jacobian * weightOfGaussPts[igp]
+        ft = Nmat * f1[1] * Jacobian * weightOfGaussPts[igp]
+        fa = Nmat * f1[0] * Jacobian * weightOfGaussPts[igp]
+        m = Bmat * f1[2] * Jacobian * weightOfGaussPts[igp]
         floc += sol.get_timoshenko_force(ft, fa, m, element_type)
     """
     REDUCED INTEGRATION LOOP
@@ -73,7 +74,7 @@ for elm in range(numberOfElements):
         Ktt += k * G * A * Nmat @ Nmat.T * Jacobian * reduced_wts[igp]
     kloc = sol.get_timoshenko_stiffness(Kuu, Kww, Kwt, Ktt, element_type)
     iv = sol.get_assembly_vector(DOF, n)
-    fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
+    fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
