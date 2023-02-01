@@ -8,7 +8,7 @@ plt.style.use('dark_background')
 '''
 Define 1D FEA Model
 '''
-numberOfElements = 10
+numberOfElements = 20
 DOF = 3
 qx = L
 element_type = param.ElementType.QUAD
@@ -22,14 +22,8 @@ connectivityMatrix = sol.get_connectivity_matrix(numberOfElements, element_type)
 weightOfGaussPts, gaussPts = sol.init_gauss_points(3)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and
                                                         element_type == param.ElementType.LINEAR) else GAUSS_POINTS_REQ)
-print(x)
-x = sol.add_node(.25, x, connectivityMatrix)
-x = sol.add_node(.75, x, connectivityMatrix)
-print(x)
-print(connectivityMatrix)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
 fg[-2] = F
-f1 = f0
 for elm in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
     xloc = []
@@ -42,11 +36,7 @@ for elm in range(numberOfElements):
     Kwt = np.zeros((element_type, element_type))
     Ktt = np.zeros((element_type, element_type))
     kloc, floc = sol.init_stiffness_force(element_type, DOF)
-    if .25 * L <= xloc[0] and xloc[-1] <= .75 * L:
-        print(xloc)
-        f1 = f0
-    else:
-        f1 = 0
+    f1 = sol.get_body_force(.25 * L, .75 * L, xloc, f0)
     """
     FULL INTEGRATION LOOP
     """
@@ -78,7 +68,6 @@ for elm in range(numberOfElements):
     iv = sol.get_assembly_vector(DOF, n)
     fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
-
 
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)

@@ -245,7 +245,7 @@ def get_nodal_displacement(u, iv):
     return uloc
 
 
-def add_node(p, x, icon):
+def shift_node(p, x, icon):
     """
     :param p: point to added node
     :param x: nodal array
@@ -262,3 +262,26 @@ def add_node(p, x, icon):
                 x[elm[-1]] = p
             break
     return x
+
+
+def get_body_force(start, stop, xloc, f):
+    """
+    This functions checks if the element has application of external force
+    and applies it , if only half element is under influence of force it
+    distributes force uniformly over that element while reducing it by x\l
+    factor
+    :param start: point where force starts acting
+    :param stop: point where force stop acting
+    :param xloc: node points associated with element
+    :param f: body force
+    :return: effective force
+    """
+    # TODO : Reduce if statements
+    le = xloc[-1] - xloc[0]
+    if start <= xloc[0] and xloc[-1] <= stop:
+        return f
+    if xloc[0] <= start <= xloc[-1]:
+        return f * (xloc[-1] - start)/le
+    if xloc[0] <= stop <= xloc[-1]:
+        return -f * (xloc[0] - stop) / le
+    return 0
