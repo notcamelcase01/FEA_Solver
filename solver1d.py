@@ -45,11 +45,11 @@ def get_node_points_coords(n, length, reqn=(0, 1)):
     rem = n % number_of_div
     exact_div = []
     for _ in range(number_of_div):
-        exact_div.append(n//number_of_div)
+        exact_div.append(n // number_of_div)
     exact_div[-1] += rem - 1
     for i in range(number_of_div):
-        x = np.hstack((x, np.linspace(length * reqn[i], length * reqn[i+1], exact_div[i], endpoint=False)))
-    x = np.append(x, reqn[-1]*length)
+        x = np.hstack((x, np.linspace(length * reqn[i], length * reqn[i + 1], exact_div[i], endpoint=False)))
+    x = np.append(x, reqn[-1] * length)
     return x
 
 
@@ -225,7 +225,7 @@ def get_timoshenko_force(ft, fa, m, element_type):
     :param element_type: element type
     :return: assembled force vector
     """
-    stf = np.zeros((element_type*3, 1))
+    stf = np.zeros((element_type * 3, 1))
     for i in range(element_type):
         stf[3 * i, 0] = fa[i]
         stf[3 * i + 1, 0] = ft[i]
@@ -268,7 +268,7 @@ def get_body_force(start, stop, xloc, f):
     """
     This functions checks if the element has application of external force
     and applies it , if only half element is under influence of force it
-    distributes force uniformly over that element while reducing it by x\l
+    distributes force uniformly over that element while reducing it by x\\l
     factor
     :param start: point where force starts acting
     :param stop: point where force stop acting
@@ -277,11 +277,13 @@ def get_body_force(start, stop, xloc, f):
     :return: effective force
     """
     # TODO : Reduce if statements
+    if f == 0:
+        return 0
     le = xloc[-1] - xloc[0]
     if start <= xloc[0] and xloc[-1] <= stop:
         return f
     if xloc[0] <= start <= xloc[-1]:
-        return f * (xloc[-1] - start)/le
+        return f * (xloc[-1] - start) / le
     if xloc[0] <= stop <= xloc[-1]:
         return -f * (xloc[0] - stop) / le
     return 0
