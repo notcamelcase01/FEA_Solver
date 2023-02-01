@@ -243,3 +243,22 @@ def get_nodal_displacement(u, iv):
     for i in range(len(iv)):
         uloc[i] = u[iv[i]]
     return uloc
+
+
+def add_node(p, x, icon):
+    """
+    :param p: point to added node
+    :param x: nodal array
+    :param icon: connectivity matrix
+    :return: nodal array
+    """
+    if p in x:
+        return x
+    for elm in icon:
+        if x[elm[0]] < p < x[elm[-1]]:
+            if p - x[elm[0]] < x[elm[-1]] - p:
+                x[elm[0]] = p
+            else:
+                x[elm[-1]] = p
+            break
+    return x
