@@ -5,9 +5,17 @@ from parameters import E, b, f0, L, F, k, G
 import keywords as param
 
 plt.style.use('dark_background')
-'''
-Define 1D FEA Model
-'''
+
+
+def get_height(xp):
+    """
+    Return height as it vary
+    :param xp: x coord
+    :return: height
+    """
+    return .01 - .005 * xp
+
+
 numberOfElements = 20
 DOF = 3
 qx = L
@@ -15,7 +23,6 @@ element_type = param.ElementType.QUAD
 OVERRIDE_REDUCED_INTEGRATION = False
 GAUSS_POINTS_REQ = 3
 REQUESTED_NODES = [0, 1]
-
 numberOfNodes = (element_type - 1) * numberOfElements + 1
 x = sol.get_node_points_coords(numberOfNodes, L, REQUESTED_NODES)
 connectivityMatrix = sol.get_connectivity_matrix(numberOfElements, element_type)
@@ -36,14 +43,14 @@ for elm in range(numberOfElements):
     Kwt = np.zeros((element_type, element_type))
     Ktt = np.zeros((element_type, element_type))
     kloc, floc = sol.init_stiffness_force(element_type, DOF)
-    f1 = sol.get_body_force(.25 * L, .75 * L, xloc, f0)
+    f1 = sol.get_body_force(0, L, xloc, f0)
     """
     FULL INTEGRATION LOOP
     """
     for igp in range(len(weightOfGaussPts)):
         xx = 0.5 * (xloc[-1] + xloc[0]) + 0.5 * (xloc[-1] - xloc[0]) * gaussPts[igp]
         Nmat, Bmat = sol.get_lagrange_fn(gaussPts[igp], Jacobian, element_type)
-        h = (.01 - .005 * xx)
+        h = get_height(xx)
         Moi = b * h ** 3 / 12
         A = b * h
         Kuu += E * A * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
@@ -58,7 +65,7 @@ for elm in range(numberOfElements):
     for igp in range(len(reduced_wts)):
         xx = 0.5 * (xloc[-1] + xloc[0]) + 0.5 * (xloc[-1] - xloc[0]) * reduced_gpts[igp]
         Nmat, Bmat = sol.get_lagrange_fn(reduced_gpts[igp], Jacobian, element_type)
-        h = (.01 - .005 * xx)
+        h = get_height(xx)
         Moi = b * h ** 3 / 12
         A = b * h
         Kww += k * G * A * Bmat @ Bmat.T * Jacobian * reduced_wts[igp]
