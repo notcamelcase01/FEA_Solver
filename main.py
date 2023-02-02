@@ -13,7 +13,7 @@ def get_height(xp):
     :param xp: x coord
     :return: height
     """
-    return .01 - .005 * xp
+    return .005 + .005 * xp
 
 
 numberOfElements = 20
@@ -42,7 +42,7 @@ for elm in range(numberOfElements):
     Kwt = np.zeros((element_type, element_type))
     Ktt = np.zeros((element_type, element_type))
     kloc, floc = sol.init_stiffness_force(element_type, DOF)
-    f1 = sol.get_body_force(.25 * L, .75 * L, xloc, f0)
+    f1 = sol.get_body_force(0, L, xloc, f0)
     Fa, Ft, Mm = sol.get_point_force(L, xloc, F)
     floc += sol.get_timoshenko_force(Ft, Fa, Mm, element_type)
     """
@@ -76,7 +76,6 @@ for elm in range(numberOfElements):
     iv = sol.get_assembly_vector(DOF, n)
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
-
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 2, 0)
