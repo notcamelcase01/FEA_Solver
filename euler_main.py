@@ -17,7 +17,7 @@ x = sol.get_node_points_coords(numberOfNodes, L)
 connectivityMatrix = sol.get_connectivity_matrix(numberOfElements, element_type)
 weightOfGaussPts, gaussPts = sol.init_gauss_points(3)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
-fg[-2] = F
+fg[-2] = F[1]
 
 for elm in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
