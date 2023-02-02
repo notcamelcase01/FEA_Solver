@@ -13,7 +13,7 @@ def get_height(xp):
     :param xp: x coord
     :return: height
     """
-    return .005 + .005 * xp
+    return .01 + .005 * xp * 0
 
 
 numberOfElements = 20
@@ -56,7 +56,7 @@ for elm in range(numberOfElements):
         A = b * h
         Kuu += E * A * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
         Ktt += E * Moi * Bmat @ Bmat.T * Jacobian * weightOfGaussPts[igp]
-        ft = Nmat * f1[1] * Jacobian * weightOfGaussPts[igp]
+        ft = np.sin(xx * np.pi/L) * Nmat * f1[1] * Jacobian * weightOfGaussPts[igp]
         fa = Nmat * f1[0] * Jacobian * weightOfGaussPts[igp]
         m = Bmat * f1[2] * Jacobian * weightOfGaussPts[igp]
         floc += sol.get_timoshenko_force(ft, fa, m, element_type)
@@ -76,6 +76,7 @@ for elm in range(numberOfElements):
     iv = sol.get_assembly_vector(DOF, n)
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
+
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 2, 0)
