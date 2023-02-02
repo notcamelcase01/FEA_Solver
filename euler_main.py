@@ -16,7 +16,7 @@ def get_height(xp):
 '''
 Define 1D FEA Model
 '''
-numberOfElements = 10
+numberOfElements = 20
 DOF = 2
 qx = L
 element_type = 2
