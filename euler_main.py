@@ -4,10 +4,19 @@ import matplotlib.pyplot as plt
 from parameters import E, b, f0, L, F
 import keywords as param
 
+
+def get_height(xp):
+    """
+    Return height as it vary
+    :param xp: x coord
+    :return: height
+    """
+    return .005 + .005 * xp
+
 '''
 Define 1D FEA Model
 '''
-numberOfElements = 10
+numberOfElements = 20
 DOF = 2
 qx = L
 element_type = 2
@@ -17,8 +26,7 @@ x = sol.get_node_points_coords(numberOfNodes, L)
 connectivityMatrix = sol.get_connectivity_matrix(numberOfElements, element_type)
 weightOfGaussPts, gaussPts = sol.init_gauss_points(3)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
-fg[-2] = F
-
+fg[-2] = F[1]
 for elm in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
     xloc = []
@@ -30,16 +38,16 @@ for elm in range(numberOfElements):
     for igp in range(len(weightOfGaussPts)):
         xx = 0.5 * (xloc[-1] + xloc[0]) + 0.5 * (xloc[-1] - xloc[0]) * gaussPts[igp]
         Nmat, Bmat = sol.get_hermite_fn(gaussPts[igp], Jacobian)
-        Moi = b * (.01 - .005 * xx) ** 3 / 12
+        Moi = b * get_height(xx) ** 3 / 12
         kloc += E * Moi * np.outer(Bmat, Bmat) * Jacobian * weightOfGaussPts[igp]
-        # won't work because B is a row vector (n,) not a matrix
-        # kloc += Bmat.T@Bmat * E * Moi * Jacobian * weightOfGaussPts[igp]
-        floc += -Nmat * f0 * Jacobian * weightOfGaussPts[igp]
+        f1 = sol.get_body_force(0, L, xloc, f0)
+        floc += Nmat * f1[1] * Jacobian * weightOfGaussPts[igp]
 
     iv = [DOF * n[0], DOF * n[0] + 1, DOF * n[1], DOF * n[1] + 1]
     fg = fg + sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG = KG + sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
+print(np.sum(fg))
 KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
 KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)
 u = sol.get_displacement_vector(KG, fg)
