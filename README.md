@@ -1,5 +1,5 @@
-# FEA_Solver
-FEA_Solver
+# FEA_Solver 
+FEA_Solver ( this branch is altered to do modal analysis)
 
 All functions are in solver1d, I just vary the main.py, currently works for 1D system, adding more functions to ease working on Timoshenko beams.
 You can change type of element by just one click, Options are provided to use reduced integration or full integration, To facilitate that I used two main loops both runs gauss quadrature, both loops run independently allowing user to choose which type of integration one can do.
@@ -18,6 +18,12 @@ Its usefull to observe effect of sheerlocking, solver1d.py is equipped to deal w
 - Adjust parameters in params file and run
 
 For we got to manually code for post processing, Main functions will just give displacements
+
+---
+
+Modes and frequencies for euler beam
+![image](https://user-images.githubusercontent.com/26081294/216604093-6ea9b0b3-062d-41f0-b74f-98815002a8fe.png)
+
 
 ---
 
