@@ -1,5 +1,6 @@
 # FEA_Solver 
 FEA_Solver ( this branch is altered to do modal analysis)
+Run this script [Modal_analysis.py](https://github.com/notcamelcase01/FEA_Solver/blob/natural_frequency/modal_analysis.py)
 
 All functions are in solver1d, I just vary the main.py, currently works for 1D system, adding more functions to ease working on Timoshenko beams.
 You can change type of element by just one click, Options are provided to use reduced integration or full integration, To facilitate that I used two main loops both runs gauss quadrature, both loops run independently allowing user to choose which type of integration one can do.
