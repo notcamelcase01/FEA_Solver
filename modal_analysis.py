@@ -30,7 +30,7 @@ for elm in range(numberOfElements):
     k = E * b * h**3 / (12 * le**3)
     m = rho * b * h * le / 420
     if xloc[0] <= crack_point <= xloc[-1]:
-        k = E * (h - crack_ratio * h)**4 / (12 * le ** 3)
+        k = E * (b - crack_ratio * b) * (h - crack_ratio * h)**3 / (12 * le ** 3)
     kloc = k * np.array([[12, 6 * le, -12, 6 * le],
                          [6 * le, 4 * le ** 2, -6 * le, 2 * le ** 2],
                          [-12, -6 * le, 12, -6 * le],
@@ -56,7 +56,7 @@ POST PROCESSING
 idx = eigenvalues.argsort()[::-1]
 eigenvalues = eigenvalues[idx]
 eigenvectors = eigenvectors[:, idx]
-eigenvalues = np.sqrt(eigenvalues)
+eigenvalues = np.sqrt(eigenvalues)/(2 * np.pi)
 eigenvalues = np.flip(eigenvalues)[2:]
 eigenvectors = np.flip(eigenvectors).T[2:]
 disp = np.zeros((4, numberOfNodes))
@@ -72,6 +72,7 @@ ax[1][0].plot(x, disp[2])
 ax[1][0].set_title("Mode Shape 3, Frequency : {f}".format(f=eigenvalues[2]))
 ax[1][1].plot(x, disp[3])
 ax[1][1].set_title("Mode Shape 1, Frequency : {f}".format(f=eigenvalues[3]))
+fig.suptitle("Modes and Frequencies for crack ration : {c}".format(c=crack_ratio))
 fig.subplots_adjust(wspace=0.1, hspace=0.45)
 for axx in ax:
     for axxx in axx:
