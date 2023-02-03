@@ -148,7 +148,7 @@ def get_lagrange_fn(gp, J, element_type):
     return Nmat[:, None], Bmat[:, None]
 
 
-def impose_boundary_condition(K, f, ibc, bc):
+def impose_boundary_condition(K, ibc, bc, f=None):
     """
     :param K: Stiffness matrix
     :param f: force vector
@@ -156,8 +156,9 @@ def impose_boundary_condition(K, f, ibc, bc):
     :param bc: boundary condition
     :return: stiffness matrix and force vector after imposed bc
     """
-    f = f - (K[:, ibc] * bc)[:, None]
-    f[ibc] = bc
+    if f is not None:
+        f = f - (K[:, ibc] * bc)[:, None]
+        f[ibc] = bc
     K[:, ibc] = 0
     K[ibc, :] = 0
     K[ibc, ibc] = 1

@@ -77,9 +77,9 @@ for elm in range(numberOfElements):
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
-KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
-KG, fg = sol.impose_boundary_condition(KG, fg, 1, 0)
-KG, fg = sol.impose_boundary_condition(KG, fg, 2, 0)
+KG, fg = sol.impose_boundary_condition(KG, 0, 0, fg)
+KG, fg = sol.impose_boundary_condition(KG, 1, 0, fg)
+KG, fg = sol.impose_boundary_condition(KG, 2, 0, fg)
 u = sol.get_displacement_vector(KG, fg)
 
 '''
