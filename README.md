@@ -1,5 +1,5 @@
 # FEA_Solver 
-FEA_Solver ( this branch is altered to do modal analysis)
+## FEA_Solver ( this branch is altered to do modal analysis)
 Run this script [Modal_analysis.py](https://github.com/notcamelcase01/FEA_Solver/blob/natural_frequency/modal_analysis.py)
 
 All functions are in solver1d, I just vary the main.py, currently works for 1D system, adding more functions to ease working on Timoshenko beams.
