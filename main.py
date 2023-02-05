@@ -13,13 +13,13 @@ def get_height(xp):
     :param xp: x coord
     :return: height
     """
-    return .01 - .005 * xp
+    return .01 * (1 - xp * 0.5 / L)
 
 
 numberOfElements = 20
 DOF = 3
-qx = L
-element_type = param.ElementType.LINEAR
+qx = L/2
+element_type = param.ElementType.QUAD
 OVERRIDE_REDUCED_INTEGRATION = False
 GAUSS_POINTS_REQ = 3
 REQUESTED_NODES = [0, 1]

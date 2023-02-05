@@ -11,14 +11,14 @@ def get_height(xp):
     :param xp: x coord
     :return: height
     """
-    return .01 - .005 * xp
+    return .01 * (1 - xp * 0.5 / L)
 
 '''
 Define 1D FEA Model
 '''
 numberOfElements = 20
 DOF = 2
-qx = L
+qx = L/2
 element_type = 2
 
 numberOfNodes = numberOfElements + 1
