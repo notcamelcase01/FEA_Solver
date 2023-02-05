@@ -13,7 +13,7 @@ def get_height(xp):
     :param xp: x coord
     :return: height
     """
-    return .01 - .005 * xp
+    return .01 * (1 - xp * 0.5 / L)
 
 
 numberOfElements = 20
