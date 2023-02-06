@@ -45,9 +45,9 @@ for elm in range(numberOfElements):
 
 
 KG = sol.impose_boundary_condition(KG, 0, 0)[0]
-KG = sol.impose_boundary_condition(KG, -2, 0)[0]
+KG = sol.impose_boundary_condition(KG, 1, 0)[0]
 MG = sol.impose_boundary_condition(MG, 0, 0)[0]
-MG = sol.impose_boundary_condition(MG, -2, 0)[0]
+MG = sol.impose_boundary_condition(MG, 1, 0)[0]
 eigenvalues, eigenvectors = np.linalg.eig(np.linalg.inv(MG) @ KG)
 
 """
@@ -71,7 +71,7 @@ ax[0][1].set_title("Mode Shape 2, Frequency : {f}".format(f=eigenvalues[1]))
 ax[1][0].plot(x, disp[2])
 ax[1][0].set_title("Mode Shape 3, Frequency : {f}".format(f=eigenvalues[2]))
 ax[1][1].plot(x, disp[3])
-ax[1][1].set_title("Mode Shape 1, Frequency : {f}".format(f=eigenvalues[3]))
+ax[1][1].set_title("Mode Shape 4, Frequency : {f}".format(f=eigenvalues[3]))
 fig.suptitle("Modes and Frequencies for crack ration : {c}".format(c=crack_ratio))
 fig.subplots_adjust(wspace=0.1, hspace=0.45)
 for axx in ax:
