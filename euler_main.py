@@ -3,6 +3,7 @@ import solver1d as sol
 import matplotlib.pyplot as plt
 from parameters import E, b, f0, L, F
 import keywords as param
+plt.style.use('dark_background')
 
 
 def get_height(xp):
@@ -18,7 +19,7 @@ Define 1D FEA Model
 '''
 numberOfElements = 20
 DOF = 2
-qx = L
+qx = L/2
 element_type = 2
 
 numberOfNodes = numberOfElements + 1
@@ -60,10 +61,12 @@ deflection = np.zeros(numberOfNodes)
 for i in range(numberOfNodes):
     disp[i] = u[2 * i]
     deflection[i] = u[2 * i + 1]
-fig, ax = plt.subplots(1, 1, figsize=(15, 7))
+fig, ax = plt.subplots(1, 1, figsize=(10, 5))
 ax.plot(x, disp, '-o')
 ax.set_xlabel("x")
 ax.set_ylabel("transverse displacement")
+z_across = np.linspace(-get_height(qx)/2, get_height(qx)/2, 20)
+strain_xx = np.zeros(len(z_across))
 for i in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, i, element_type)
     xloc = []
@@ -74,7 +77,18 @@ for i in range(numberOfElements):
         eta = -1 + 2 * (qx - xloc[0]) / (xloc[-1] - xloc[0])
         Nmat, Bmat = sol.get_hermite_fn(eta, 0.5 * (xloc[-1] - xloc[0]))
         disp = np.dot(Nmat.T, uloc)[0][0]
+        for jj in range(len(z_across)):
+            strain_xx[jj] = -z_across[jj] * Bmat.T @ uloc
         ax.set_title('Displacements at {qx}m: {dp}m'.format(qx=qx, dp=disp))
         ax.scatter(qx, disp, color="#000000")
         break
+fig,  (ax2, ax3) = plt.subplots(1, 2, figsize=(16, 5))
+ax2.plot(strain_xx, z_across, marker="o")
+ax2.set_xlabel("$\\epsilon_{xx}$")
+ax2.set_ylabel("Z")
+ax2.set_title("Strain at top fiber : {ttt}".format(ttt=strain_xx[-1]))
+ax3.plot(strain_xx * E, z_across, marker="o")
+ax3.set_xlabel("$\\sigma_{xx}$")
+ax3.set_ylabel("Z")
+ax3.set_title("Stress at top fiber : {ttt}".format(ttt=strain_xx[-1] * E))
 plt.show()
