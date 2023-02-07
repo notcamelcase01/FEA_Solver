@@ -94,6 +94,8 @@ for i in range(numberOfNodes):
     theta.append(u[3 * i + 2][0])
 print(u[-2])
 red_d = "Invalid query length"
+z_across = np.linspace(-get_height(qx)/2, get_height(qx)/2, 20)
+strain_xx = np.zeros(len(z_across))
 for elm in range(numberOfElements):
     n = sol.get_node_from_element(connectivityMatrix, elm, element_type)
     xloc = []
@@ -101,16 +103,29 @@ for elm in range(numberOfElements):
         xloc.append(x[n[i]])
     le = xloc[-1] - xloc[0]
     uloc = sol.get_nodal_displacement(td, n)
+    uloc_theta = sol.get_nodal_displacement(theta, n)
+    uloc_axial = sol.get_nodal_displacement(ad, n)
     if xloc[0] <= qx <= xloc[-1]:
         gp = -1 + 2 * (qx - xloc[0]) / le
         Nmat, Bmat = sol.get_lagrange_fn(gp, le / 2, element_type)
         red_d = (Nmat.T @ uloc)[0][0]
-        print(red_d)
+        print(Bmat.T @ uloc_theta)
+        for i in range(len(z_across)):
+            strain_xx[i] = z_across[i] * (Bmat.T @ uloc_axial + Bmat.T @ uloc_theta)
         break
-fig, ax1 = plt.subplots(1, 1, figsize=(10, 5))
+fig0, ax1 = plt.subplots(1, 1, figsize=(10, 5))
+fig,  (ax2, ax3) = plt.subplots(1, 2, figsize=(16, 5))
 ax1.plot(x, td, marker="o", label="transverse displacement")
 ax1.set_xlabel("Length")
 ax1.set_ylabel("Transverse Displacement")
 ax1.set_title("Displacement at x = {L}m : {ttt}m".format(L=qx, ttt=red_d))
 ax1.legend()
+ax2.plot(strain_xx, z_across, marker="o")
+ax2.set_xlabel("$\\epsilon_{xx}$")
+ax2.set_ylabel("Z")
+ax2.set_title("Strain at top fiber : {ttt}".format(ttt=strain_xx[-1]))
+ax3.plot(strain_xx * E, z_across, marker="o")
+ax3.set_xlabel("$\\sigma_{xx}$")
+ax3.set_ylabel("Z")
+ax3.set_title("Stress at top fiber : {ttt}".format(ttt=strain_xx[-1] * E))
 plt.show()
