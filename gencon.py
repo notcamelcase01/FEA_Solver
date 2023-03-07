@@ -42,10 +42,9 @@ def get_2d_connectivity(nx, ny, lx, ly):
     ax2.axis('tight')
     ax2.axis('off')
     ax2.set_title("icon matrix table")
-    node_array = node_array.transpose()
     return icon, node_array
 
 if __name__ == "__main__":
     ic, na = get_2d_connectivity(4, 4, 10, 2)
-    print(na,"23424324")
+    print(na)
     print(ic)
