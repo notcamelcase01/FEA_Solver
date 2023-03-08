@@ -10,8 +10,8 @@ plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 2
-ny = 2
+nx = 1
+ny = 1
 connectivityMatrix, nodalArray = gencon.get_2d_connectivity(nx, ny, L, L)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 6
@@ -19,7 +19,7 @@ element_type = param.ElementType.LINEAR
 OVERRIDE_REDUCED_INTEGRATION = False
 GAUSS_POINTS_REQ = 1
 numberOfNodes = nodalArray.shape[1]
-weightOfGaussPts, gaussPts = sol.init_gauss_points(1)
+weightOfGaussPts, gaussPts = sol.init_gauss_points(GAUSS_POINTS_REQ)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and
                                                         element_type == param.ElementType.LINEAR) else GAUSS_POINTS_REQ)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)

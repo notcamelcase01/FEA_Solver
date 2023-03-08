@@ -17,8 +17,6 @@ def get_2d_connectivity(nx, ny, lx, ly):
     x = np.linspace(0, width, nx + 1)
     y = np.linspace(0, height, ny + 1)
     x_1, y_1 = np.meshgrid(x, y)
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 9))
-    ax1.scatter(x_1, y_1)
     x_1 = x_1.reshape(1, nnod)[0]
     y_1 = y_1.reshape(1, nnod)[0]
     node_array = np.array([np.arange(0, nnod, 1, dtype=np.int32), x_1, y_1])
@@ -29,22 +27,9 @@ def get_2d_connectivity(nx, ny, lx, ly):
     icon[3, :] = icon[1, :] + 1
     icon[4, :] = icon[2, :] + 1
     icon = icon.transpose()
-    for i in range(nnod):
-        ax1.text(node_array[1][i], node_array[2][i], str(node_array[0][i]))
-    for i in range(nelm):
-        ax1.text(node_array[1][icon[i][1]] + (lx/nx) * 0.5, node_array[2][icon[i][1]] + (ly/ny) * 0.5, str(icon[i][0]),
-                 fontsize=12, color="blue")
-    ax1.axis("equal")
-    ax1.set_xlabel("Elements in blue, nodes in white")
-    ax1.set_title(str(nx) + "x" + str(ny) + " mesh with " + str(nnod) + " nodes")
-    columns = ("Element", "#1", "#2", "#3", "#4")
-    ax2.table(cellText=icon, colLabels=columns, loc="center")
-    ax2.axis('tight')
-    ax2.axis('off')
-    ax2.set_title("icon matrix table")
-    return icon, node_array
+    return icon, node_array, np.meshgrid(x, y)
 
 if __name__ == "__main__":
-    ic, na = get_2d_connectivity(4, 4, 10, 2)
+    ic, na, mg = get_2d_connectivity(1, 1, 1, 1)
     print(na)
     print(ic)
