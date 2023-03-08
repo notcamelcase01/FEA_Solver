@@ -10,8 +10,8 @@ plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 12
-ny = 12
+nx = 4
+ny = 4
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity(nx, ny, lx, ly)
@@ -96,7 +96,7 @@ for i in range(numberOfNodes):
 xxx = min(w0)
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))
-ax.contourf(X, Y, w0, 30, cmap='RdGy')
+ax.contourf(X, Y, w0, 70, cmap='RdGy')
 ax.set_title('Contour Plot, w_max = {x}'.format(x = xxx))
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
