@@ -1,13 +1,12 @@
 import numpy as np
 import solver2d as sol
 import matplotlib.pyplot as plt
-from parameters import L
 import keywords as param
 import gencon as gencon
 import mindlinplate as mind
 plt.style.use('dark_background')
 
-
+L = .1
 H = L/100
 DIMENSION = 2
 nx = 10
@@ -41,6 +40,16 @@ for elm in range(numberOfElements):
         yloc.append(nodalArray[2][n[i]])
     xloc = np.array(xloc)[:, None]
     yloc = np.array(yloc)[:, None]
+    Jx = 0.5 * (xloc[2][0] - xloc[0][0])
+    if np.isclose(yloc[1][0], ly/2):
+        q0 = 1
+        xeta = 1
+    elif yloc[0][0] < ly/2 < yloc[1][0]:
+        q0 = 1
+        xeta = -1 + 2 * (ly/2 - yloc[0][0]) / (yloc[1][0] - yloc[0][0])
+    else:
+        xeta = 0
+        q0 = 0
     kloc, floc = sol.init_stiffness_force(nodePerElement, DOF)
     for xgp in range(len(weightOfGaussPts)):
         for ygp in range(len(weightOfGaussPts)):
@@ -56,7 +65,8 @@ for elm in range(numberOfElements):
                 T1 += sol.assemble_stiffness(Jinv, [2 * pli, 2*pli + 1], 8)
             B1 = T1 @ mind.get_B1_matrix(Nx, Ny)
             kloc += B1.T @ D1mat @ B1 * weightOfGaussPts[xgp] * weightOfGaussPts[ygp] * np.linalg.det(J)
-            floc += (mind.get_N_matrix(N).T @ np.array([[0, 0, 0, 0, -1000000]]).T) * weightOfGaussPts[xgp] * weightOfGaussPts[ygp] * np.linalg.det(J)
+        N, Nx, Ny = mind.get_lagrange_shape_function(gaussPts[xgp], xeta)
+        floc += q0 * (mind.get_N_matrix(N).T @ np.array([[0, 0, 0, 0, -1]]).T) * weightOfGaussPts[xgp]  * Jx
     for xgp in range(len(reduced_wts)):
         for ygp in range(len(reduced_wts)):
             N, Nx, Ny = mind.get_lagrange_shape_function(reduced_gpts[xgp], reduced_gpts[ygp])
@@ -76,7 +86,7 @@ for elm in range(numberOfElements):
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 print(sum(fg))
-encastrate = np.where((nodalArray[1] == 0.0) | (nodalArray[1] == lx) | (nodalArray[2] == 0.0) | (nodalArray[2] == ly))[0]
+encastrate = np.where((nodalArray[1] == 0.0) | (nodalArray[1] == lx))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
 for i in iv:
     KG, fg = sol.impose_boundary_condition(KG, fg, i, 0)
@@ -92,13 +102,15 @@ for i in range(numberOfNodes):
     theta_x.append(u[DOF * i + 2][0])
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
-xxx = min(w0)
+ii = np.where((np.isclose(nodalArray[1], lx/2)) & (np.isclose(nodalArray[2], ly/2)))[0]
+xxx = u[DOF * ii + 4]
+sdf = min(w0)
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))
 ax.contourf(X, Y, w0, 100, cmap='jet')
-ax.set_title('Contour Plot, w_max = {x}'.format(x = xxx))
+ax.set_title('Contour Plot, w_a = {x}'.format(x = xxx))
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
 ax.set_aspect('equal')
-print(w0)
+print(sdf)
 plt.show()

@@ -31,6 +31,7 @@ for igp in range(len(weightOfGaussPts)):
     Z2mat = mind.get_z2_matrix(0.5 * H * gaussPts[igp])
     D1mat += Z1mat.T @ mind.get_C1_matrix() @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
     D2mat += Z2mat.T @ mind.get_C2_matrix() @ Z2mat * 0.5 * H * weightOfGaussPts[igp]
+hole_elements = [17, 18, 27, 28]
 
 for elm in range(numberOfElements):
     n = connectivityMatrix[elm][1:]
@@ -73,14 +74,29 @@ for elm in range(numberOfElements):
             B2 = T2 @ mind.get_B2_matrix(N, Nx, Ny)
             kloc += B2.T @ D2mat @ B2 * reduced_wts[xgp] * reduced_wts[ygp] * np.linalg.det(J)
     iv = mind.get_assembly_vector(DOF, n)
+    kk = 1
+    if elm in hole_elements:
+        kk = 0
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
-print(sum(fg))
+
+
+iv = sol.get_assembly_vector(DOF, hole_elements)
+for i in iv:
+    fg[i] = 0
+
 encastrate = np.where((nodalArray[1] == 0.0) | (nodalArray[1] == lx) | (nodalArray[2] == 0.0) | (nodalArray[2] == ly))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
+
+
 for i in iv:
     KG, fg = sol.impose_boundary_condition(KG, fg, i, 0)
+
+
 u = sol.get_displacement_vector(KG, fg)
+# iv = sol.get_assembly_vector(DOF, [30])
+# for i in iv:
+#     u[i] = 0
 u0 = []
 v0 = []
 theta_x = []
@@ -93,12 +109,12 @@ for i in range(numberOfNodes):
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
 xxx = min(w0)
+reqD = u[5 * 40 + 4]
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))
-ax.contourf(X, Y, w0, 100, cmap='jet')
-ax.set_title('Contour Plot, w_max = {x}'.format(x = xxx))
+ax.contourf(X, Y, w0, 70, cmap='RdGy')
+ax.set_title('Contour Plot, w_A = {x}'.format(x = reqD))
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
 ax.set_aspect('equal')
-print(w0)
 plt.show()

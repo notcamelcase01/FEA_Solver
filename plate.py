@@ -10,14 +10,16 @@ plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 1
-ny = 1
-connectivityMatrix, nodalArray = gencon.get_2d_connectivity(nx, ny, L, L)
+nx = 2
+lx = L
+ly = L
+ny = 2
+connectivityMatrix, nodalArray, (X0, Y0)  = gencon.get_2d_connectivity(nx, ny, L, L)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 6
 element_type = param.ElementType.LINEAR
 OVERRIDE_REDUCED_INTEGRATION = False
-GAUSS_POINTS_REQ = 1
+GAUSS_POINTS_REQ = 3
 numberOfNodes = nodalArray.shape[1]
 weightOfGaussPts, gaussPts = sol.init_gauss_points(GAUSS_POINTS_REQ)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and
@@ -48,16 +50,34 @@ for elm in range(numberOfElements):
             N = kirk.get_n_matrix(Lmat, Nmat, Nmat1, Nmat2, Nmat3)
             kloc += B.T @ Dmat @ B * Jx * Jy * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp]
             floc += N.T @ np.array([0, 0, 1])[:, None] * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * Jx * Jy
-    iv = sol.get_assembly_vector(DOF, n)
+    iv = kirk.get_assembly_vector(DOF, n)
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
-encastrate = np.where((nodalArray[1] == 0.0) | (nodalArray[2] == L))[0]
-for i in encastrate:
-    associated_nodes = [6*i + j for j in range(6)]
-    for ibc in associated_nodes:
-        KG, fg = sol.impose_boundary_condition(KG, fg, ibc, 0)
+encastrate = np.where((nodalArray[1] == 0.0) | (nodalArray[1] == lx) | (nodalArray[2] == 0.0) | (nodalArray[2] == ly))[0]
+iv = sol.get_assembly_vector(DOF, encastrate)
+
+for ibc in iv:
+    KG, fg = sol.impose_boundary_condition(KG, fg, ibc, 0)
 
 u = sol.get_displacement_vector(KG, fg)
 
-print(u)
+u0 = []
+v0 = []
+theta_x = []
+theta_y = []
+w0 = []
+for i in range(numberOfNodes):
+    u0.append(u[DOF * i][0])
+    v0.append(u[DOF * i + 1][0])
+    w0.append(u[DOF * i + 2][0])
+xxx = min(w0)
+fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+w0 = np.array(w0).reshape((ny + 1, nx + 1))
+ax.contourf(X0, Y0, w0, 70, cmap='RdGy')
+ax.set_title('Contour Plot, w_max = {x}'.format(x = xxx))
+ax.set_xlabel('_x')
+ax.set_ylabel('_y')
+ax.set_aspect('equal')
+print(w0)
+plt.show()

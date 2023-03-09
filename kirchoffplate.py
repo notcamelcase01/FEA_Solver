@@ -168,3 +168,17 @@ def get_hermite_shape_function_derivative_xy(x_gp, y_gp, Jx, Jy, element_type=2,
         Nmatxy_2[i] = -1 / (16 * Jx * Jy) * seq[i][1] * (2 * (y_gp + seq[i][1]) * (y_gp * seq[i][1] - 1) + (y_gp + seq[i][1]) ** 2 * seq[i][1]) *  (2 * (x_gp + seq[i][0]) * (x_gp * seq[i][0] - 2) + (x_gp + seq[i][0]) ** 2 * seq[i][0])
         Nmatxy_3[i] = 1 / (16 * Jx * Jy) * seq[i][0] * seq[i][1] * (2 * (x_gp + seq[i][0]) * (x_gp * seq[i][0] - 1) + (x_gp + seq[i][0]) ** 2 * seq[i][0]) * (2 * (y_gp + seq[i][1]) * (y_gp * seq[i][1] - 1) + (y_gp + seq[i][1]) ** 2 * seq[i][1])
     return Nmatxy[:, None], Nmatxy_1[:, None], Nmatxy_2[:, None], Nmatxy_3[:, None]
+
+
+def get_assembly_vector(DOF, n):
+    """
+    :param DOF: dof
+    :param n: nodes
+    :return: assembly points
+    """
+    iv = [0] * 25
+    for i in range(len(n)):
+        situ =  [0 + i, 4 + i, 8 + i, 12 + i, 16 + i, 20 + i]
+        for j in range(len(situ)):
+            iv[situ[j]] = n[i] * DOF + j
+    return iv
