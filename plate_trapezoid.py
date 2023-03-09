@@ -9,8 +9,8 @@ plt.style.use('dark_background')
 L = .1
 H = .001
 DIMENSION = 2
-nx = 4
-ny = 4
+nx = 10
+ny = 10
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity_trap(nx, ny, lx, ly)

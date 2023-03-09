@@ -112,7 +112,7 @@ xxx = min(w0)
 reqD = u[5 * 40 + 4]
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))
-ax.contourf(X, Y, w0, 70, cmap='RdGy')
+ax.contourf(X, Y, w0, 70, cmap='jet')
 ax.set_title('Contour Plot, w_A = {x}'.format(x = reqD))
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
