@@ -3,7 +3,7 @@ import solver2d as sol
 import matplotlib.pyplot as plt
 from parameters import L
 import keywords as param
-import gencon as gencon
+from Plates import gencon as gencon
 import mindlinplate as mind
 plt.style.use('dark_background')
 
@@ -85,7 +85,7 @@ iv = sol.get_assembly_vector(DOF, hole_elements)
 for i in iv:
     fg[i] = 0
 
-encastrate = np.where((nodalArray[1] == 0.0) | (nodalArray[1] == lx) | (nodalArray[2] == 0.0) | (nodalArray[2] == ly))[0]
+encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1], lx)) | (np.isclose(nodalArray[2], 0)) | (np.isclose(nodalArray[2], ly)))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
 
 
@@ -108,12 +108,17 @@ for i in range(numberOfNodes):
     theta_x.append(u[DOF * i + 2][0])
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
-xxx = min(w0)
-reqD = u[5 * 40 + 4]
+
+reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.7, 0.7), nodalArray, numberOfElements, nodePerElement)
+if reqN is None:
+    raise Exception("Chose a position inside plate plis")
+N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
+wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
+xxx = N.T @ wt
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))
 ax.contourf(X, Y, w0, 70, cmap='jet')
-ax.set_title('Contour Plot, w_A = {x}'.format(x = reqD))
+ax.set_title('Contour Plot, w_A = {x}'.format(x = xxx))
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
 ax.set_aspect('equal')

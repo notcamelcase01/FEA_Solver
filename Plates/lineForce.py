@@ -2,15 +2,15 @@ import numpy as np
 import solver2d as sol
 import matplotlib.pyplot as plt
 import keywords as param
-import gencon as gencon
+from Plates import gencon as gencon
 import mindlinplate as mind
 plt.style.use('dark_background')
 
 L = .1
 H = L/100
 DIMENSION = 2
-nx = 10
-ny = 10
+nx = 16
+ny = 16
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity(nx, ny, lx, ly)
@@ -86,7 +86,7 @@ for elm in range(numberOfElements):
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 print(sum(fg))
-encastrate = np.where((nodalArray[1] == 0.0) | (nodalArray[1] == lx))[0]
+encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1], lx)))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
 for i in iv:
     KG, fg = sol.impose_boundary_condition(KG, fg, i, 0)
@@ -102,8 +102,12 @@ for i in range(numberOfNodes):
     theta_x.append(u[DOF * i + 2][0])
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
-ii = np.where((np.isclose(nodalArray[1], lx/2)) & (np.isclose(nodalArray[2], ly/2)))[0]
-xxx = u[DOF * ii + 4]
+reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.05, 0.05), nodalArray, numberOfElements, nodePerElement)
+if reqN is None:
+    raise Exception("Chose a position inside plate plis")
+N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
+wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
+xxx = N.T @ wt
 sdf = min(w0)
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))

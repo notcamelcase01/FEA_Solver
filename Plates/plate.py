@@ -1,9 +1,9 @@
 import numpy as np
 import solver2d as sol
 import matplotlib.pyplot as plt
-from parameters import E, b, f0, L, F, k, G
+from parameters import L
 import keywords as param
-import gencon as gencon
+from Plates import gencon as gencon
 import kirchoffplate as kirk
 
 plt.style.use('dark_background')
