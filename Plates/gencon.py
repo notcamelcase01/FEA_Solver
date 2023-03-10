@@ -59,13 +59,13 @@ def get_2d_connectivity_trap(nx, ny, lx, ly):
     y = np.linspace(-height/2, height/2, ny + 1)
     x_1, y_1 = np.meshgrid(x, y)
     y_1 *= 0.5/x.max() * x + 0.5
-    x_1 = x_1.reshape(1, nnod)[0]
-    y_1 = y_1.reshape(1, nnod)[0]
-    node_array = np.array([np.arange(0, nnod, 1, dtype=np.int32), x_1, y_1])
+    x_2 = x_1.reshape(1, nnod)[0]
+    y_2 = y_1.reshape(1, nnod)[0]
+    node_array = np.array([np.arange(0, nnod, 1, dtype=np.int32), x_2, y_2])
     # fig, ax1 = plt.subplots(1, 1, figsize=(12, 5))
     # ax1.scatter(x_1, y_1)
     # plt.show()
-    return icon, node_array, np.meshgrid(x, y)
+    return icon, node_array, (x_1, y_1)
 
 if __name__ == "__main__":
     ic, na, mg = get_2d_connectivity(1, 1, 1, 1)

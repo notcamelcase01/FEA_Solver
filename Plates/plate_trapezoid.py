@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import keywords as param
 from Plates import gencon as gencon
 import mindlinplate as mind
+from mpl_toolkits import mplot3d
 plt.style.use('dark_background')
 
 L = .1
@@ -91,15 +92,20 @@ for i in range(numberOfNodes):
     theta_x.append(u[DOF * i + 2][0])
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
+
 reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.05, 0.0), nodalArray, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
 N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
 wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
 xxx = N.T @ wt
-fig, ax = plt.subplots(1, 1, figsize=(6, 6))
-w0 = np.array(w0).reshape((ny + 1, nx + 1))
+w0 = -np.array(w0) * 100 / np.min(w0)
+w0 = w0.reshape((ny + 1, nx + 1))
 print(w0)
+fig = plt.figure(figsize=(6, 6))
+ax = plt.axes(projection='3d')
+ax.plot_surface(X, Y, w0)
+fig2, ax = plt.subplots(1, 1, figsize=(6, 6))
 ax.contourf(X, Y, w0, 100, cmap='jet')
 ax.set_title('Contour Plot,w_A = {x}'.format(x = xxx))
 ax.set_xlabel('_x')
