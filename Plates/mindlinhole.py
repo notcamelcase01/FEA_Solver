@@ -10,11 +10,19 @@ plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 10
-ny = 10
+# DISCRITIZATION OF HOLE
+Hx = 3
+Hy = 3
+by_max = 0.3
+by_min = 0.1
+bx_max = 0.9
+bx_min = 0.7
+# DISCRITIZATION OF PLATE
+nx = 7
+ny = 7
 lx = L
 ly = L
-connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity(nx, ny, lx, ly)
+connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_min)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 5
 element_type = param.ElementType.LINEAR
@@ -109,17 +117,10 @@ for i in range(numberOfNodes):
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
 
-reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.7, 0.7), nodalArray, numberOfElements, nodePerElement)
+reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.7, 0.3), nodalArray, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
 N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
 wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
 xxx = N.T @ wt
-fig, ax = plt.subplots(1, 1, figsize=(6, 6))
-w0 = np.array(w0).reshape((ny + 1, nx + 1))
-ax.contourf(X, Y, w0, 70, cmap='jet')
-ax.set_title('Contour Plot, w_A = {x}'.format(x = xxx))
-ax.set_xlabel('_x')
-ax.set_ylabel('_y')
-ax.set_aspect('equal')
-plt.show()
+print(xxx)

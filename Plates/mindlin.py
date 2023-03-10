@@ -93,14 +93,19 @@ for i in range(numberOfNodes):
     theta_x.append(u[DOF * i + 2][0])
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
-reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.7, 0.7), nodalArray, numberOfElements, nodePerElement)
+reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.7, 0.3), nodalArray, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
 N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
 wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
 xxx = N.T @ wt
+w0 = -np.array(w0) * .2 / np.min(w0) # Scaled w to make it look better
+w0 = w0.reshape((ny + 1, nx + 1))
+fig2 = plt.figure(figsize=(6, 6))
+ax = plt.axes(projection='3d')
+ax.plot_surface(X, Y, w0)
+ax.set_aspect('equal')
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
-w0 = np.array(w0).reshape((ny + 1, nx + 1))
 ax.contourf(X, Y, w0, 100, cmap='jet')
 ax.set_title('Contour Plot, w_A = {x}'.format(x = xxx))
 ax.set_xlabel('_x')
