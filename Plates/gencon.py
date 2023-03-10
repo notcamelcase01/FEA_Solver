@@ -114,14 +114,16 @@ def get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_
 
     idx = ((x_1 <= bx_min + step_x) | (x_1 >= bx_max - step_x) | (y_1 <= by_min + step_y) | (y_1 >= by_max - step_y))
 
-    x_0[~idx] = np.nan
-    y_0[~idx] = np.nan
+    x_1[~idx] = np.nan
+    y_1[~idx] = np.nan
     fig, ax1 = plt.subplots(1, 1, figsize=(6, 5))
-    ax1.scatter(x_0, y_0)
+    ax1.scatter(x_1, y_1)
     plt.show()
-    # node_array = np.array([np.arange(0, nnod, 1, dtype=np.int32), x_2, y_2])
+    x_2 = x_1.reshape(1, nnod)[0]
+    y_2 = y_1.reshape(1, nnod)[0]
+    node_array1 = np.array([np.arange(0, nnod, 1, dtype=np.int32), x_2, y_2])
 
-    return icon, node_array, (x_1, y_1)
+    return icon, node_array, (x_1, y_1), node_array1
 
 
 if __name__ == "__main__":
@@ -139,7 +141,7 @@ if __name__ == "__main__":
     lx = L
     ly = L
 
-    connectivityMatrix, nodalArray, (X, Y) = get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min,
+    connectivityMatrix, nodalArray, (X, Y), ii = get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min,
                                                                              bx_max, bx_min)
     print(nodalArray)
     print(connectivityMatrix)

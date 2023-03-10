@@ -87,5 +87,7 @@ def get_node_from_cord(icon, position, nodalArray, nelm, nodePerElement):
         if xloc[0] <= position[0] <= xloc[3] and yloc[0] <= position[1] <= yloc[3]:
             eta = -1 + 2 * (position[1] - yloc[0]) / (yloc[3] - yloc[0])
             zeta = -1 + 2 * (position[0] - xloc[0]) / (xloc[3] - xloc[0])
+            if np.isnan(np.sum(xloc)) or np.isnan(np.sum(yloc)):
+                return None, None, None
             return n, zeta, eta
     return None, None, None

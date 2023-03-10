@@ -11,18 +11,18 @@ plt.style.use('dark_background')
 H = L/100
 DIMENSION = 2
 # DISCRITIZATION OF HOLE
-Hx = 3
-Hy = 3
+Hx = 2
+Hy = 2
 by_max = 0.3
 by_min = 0.1
 bx_max = 0.9
 bx_min = 0.7
 # DISCRITIZATION OF PLATE
-nx = 7
-ny = 7
+nx = 8
+ny = 8
 lx = L
 ly = L
-connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_min)
+connectivityMatrix, nodalArray, (X, Y), nodalArray1 = gencon.get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_min)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 5
 element_type = param.ElementType.LINEAR
@@ -39,10 +39,17 @@ for igp in range(len(weightOfGaussPts)):
     Z2mat = mind.get_z2_matrix(0.5 * H * gaussPts[igp])
     D1mat += Z1mat.T @ mind.get_C1_matrix() @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
     D2mat += Z2mat.T @ mind.get_C2_matrix() @ Z2mat * 0.5 * H * weightOfGaussPts[igp]
-hole_elements = [17, 18, 27, 28]
+hole_elements = []
 
 for elm in range(numberOfElements):
     n = connectivityMatrix[elm][1:]
+    xloc = []
+    yloc = []
+    for i in range(nodePerElement):
+        xloc.append(nodalArray1[1][n[i]])
+        yloc.append(nodalArray1[2][n[i]])
+    if np.isnan(np.sum(xloc)) or np.isnan(np.sum(yloc)):
+        hole_elements.append(elm)
     xloc = []
     yloc = []
     for i in range(nodePerElement):
@@ -89,6 +96,7 @@ for elm in range(numberOfElements):
     KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
 
 
+print(hole_elements)
 iv = sol.get_assembly_vector(DOF, hole_elements)
 for i in iv:
     fg[i] = 0
@@ -117,7 +125,7 @@ for i in range(numberOfNodes):
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
 
-reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.7, 0.3), nodalArray, numberOfElements, nodePerElement)
+reqN, zeta, eta = mind.get_node_from_cord(connectivityMatrix, (0.7, 0.3), nodalArray1, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
 N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
