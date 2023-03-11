@@ -10,12 +10,12 @@ plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 10
+nx = 4
 lx = L
 ly = L
-ny = 10
-Jx = lx/nx
-Jy = ly/ny
+ny = 4
+jx = lx/nx/2
+jy = ly/ny/2
 connectivityMatrix, nodalArray, (X0, Y0)  = gencon.get_2d_connectivity(nx, ny, L, L)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 6
@@ -42,28 +42,10 @@ for elm in range(numberOfElements):
     kloc, floc = sol.init_stiffness_force(element_type**DIMENSION, DOF)
     for x_igp in range(len(weightOfGaussPts)):
         for y_igp in range(len(weightOfGaussPts)):
-            Lmat, Lmatx, Lmaty = kirk.get_lagrange_shape_function(gaussPts[x_igp], gaussPts[y_igp],Jy)
-            Nmat, Nmat1, Nmat2, Nmat3 = kirk.get_hermite_shape_function(gaussPts[x_igp], gaussPts[y_igp])
-            Nmatxx, Nmat1xx, Nmat2xx, Nmat3xx = kirk.get_hermite_shape_function_derivative_xx(gaussPts[x_igp], gaussPts[y_igp], Jy**2)
-            Nmatyy, Nmat1yy, Nmat2yy, Nmat3yy = kirk.get_hermite_shape_function_derivative_yy(gaussPts[x_igp], gaussPts[y_igp], Jy**2)
-            Nmatxy, Nmat1xy, Nmat2xy, Nmat3xy = kirk.get_hermite_shape_function_derivative_xy(gaussPts[x_igp], gaussPts[y_igp], Jy**2)
-            J = np.zeros((2, 2))
-            J[0, 0] = Lmatx.T @ xloc
-            J[0, 1] = Lmatx.T @ yloc
-            J[1, 0] = Lmaty.T @ xloc
-            J[1, 1] = Lmaty.T @ yloc
-            Jinv = np.linalg.inv(J)
-            t1 = np.array([[Jinv[0][0], Jinv[0][1], 0, 0, 0, 0, 0],
-                           [Jinv[1][0], Jinv[1][1], 0, 0, 0, 0, 0],
-                           [0, 0, Jinv[0][0], Jinv[0][1], 0, 0, 0],
-                           [0, 0, Jinv[1][0], Jinv[1][1], 0, 0, 0],
-                           [0, 0, 0, 0, Jinv[0][0]**2, Jinv[0][1]**2, 0],
-                           [0, 0, 0, 0, Jinv[1][0]**2, Jinv[1][1]**2, 0],
-                           [0, 0, 0, 0, Jinv[0][0]*Jinv[1][0], Jinv[0][1]*Jinv[1][1], (Jinv[1][0]*Jinv[0][1]+Jinv[0][0]*Jinv[1][1])]])
-            B = kirk.get_b_matrix(Lmatx, Lmaty, Nmatxx, Nmatyy, Nmatxy, Nmat1xx, Nmat1yy, Nmat1xy, Nmat2xx, Nmat2yy, Nmat2xy, Nmat3xx, Nmat3yy, Nmat3xy)
-            N = kirk.get_n_matrix(Lmat, Nmat, Nmat1, Nmat2, Nmat3)
-            kloc += B.T @ Dmat @ B * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * Jy**2
-            floc += N.T @ np.array([0, 0, -1000000])[:, None] * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * Jy**2
+            N = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx * 2, jy * 2, jx, jy, True)
+            B = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx * 2, jy * 2, jx, jy)
+            kloc += B.T @ Dmat @ B * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy*jx
+            floc += N.T @ np.array([0, 0, -1000000])[:, None] * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy*jx
     iv = kirk.get_assembly_vector(DOF, n)
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_2Dmat(kloc, iv, numberOfNodes * DOF)
@@ -88,8 +70,7 @@ for i in range(numberOfNodes):
 reqN, zeta, eta = sol.get_node_from_cord(connectivityMatrix, (0.7, 0.3), nodalArray, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
-Lmat, Lmatx, Lmaty = kirk.get_lagrange_shape_function(zeta, eta, Jy)
-Nmat, Nmat1, Nmat2, Nmat3 = kirk.get_hermite_shape_function(eta, zeta)
+Nmat, Nmat1, Nmat2, Nmat3 = kirk.get_BorN_F(eta, zeta, 2 * jx, 2 * jy, jx, jy, justN=True)
 wt = np.array([u[DOF * i + 2][0] for i in reqN])[:, None]
 wxt = np.array([u[DOF * i + 3][0] for i in reqN])[:, None]
 wyt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]

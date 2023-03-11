@@ -1,17 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 
-j = np.array([[0, -0.5, 0, 0, 0, 0.5, 0, 0, 0],
-              [0, 0, 0, 0.5, 0, 0, 0, -0.5, 0]])
+x = np.linspace(-150, 150, 300)
+y = np.linspace(-150, 150, 300)
+X,Y = np.meshgrid(x,y)
+data = np.exp(-(X/80.)**2-(Y/80.)**2)
 
-x = np.array([[0, 0, 0, 5, 10, 10, 10, 5, 5],
-              [0, 5, 10, 10, 10, 5, 0, 0, 5]])
+R = np.sqrt(X**2+Y**2)
+flag =np.logical_not( (R<110) * (R>10) )
+data[flag] = np.nan
 
-def f1(e):
-    return 10/e + 1.8 + 6/5, 6/5 - 15/e - 4.2
+palette = plt.cm.jet
+palette.set_bad(alpha = 0.0)
 
-def f2(e):
-    return 6/5 - 36*e/125, -5/e - 6/5 + 36*e/25
+im = plt.imshow(data)
 
-print(f1(.01))
-print(f2(.01))
+plt.colorbar(im)
+plt.savefig(__file__+".png")
+plt.show()

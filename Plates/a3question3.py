@@ -11,8 +11,8 @@ plt.style.use('dark_background')
 L = .1
 H = L/100
 DIMENSION = 2
-nx = 10
-ny = 10
+nx = 20
+ny = 20
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity(nx, ny, lx, ly)
@@ -110,12 +110,14 @@ if reqN is None:
 N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
 wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
 xxx = N.T @ wt
-w0 = np.array(w0) * 10 # scaling z so its visible on graph
+w0 = np.array(w0) * 20 # scaling z so its visible on graph
 w0 = w0.reshape((ny + 1, nx + 1))
 print(w0)
 fig2 = plt.figure(figsize=(6, 6))
 ax = plt.axes(projection='3d')
-ax.plot_surface(X, Y, w0)
+ax.plot_wireframe(X, Y, w0)
+ax.set_axis_off()
+ax.set_title("w0 is scaled to make graph look prettier")
 ax.set_aspect('equal')
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))
