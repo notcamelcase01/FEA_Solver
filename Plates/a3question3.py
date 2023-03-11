@@ -43,12 +43,12 @@ for elm in range(numberOfElements):
     xloc = np.array(xloc)[:, None]
     yloc = np.array(yloc)[:, None]
     Jx = 0.5 * (xloc[2][0] - xloc[0][0])
-    if np.isclose(yloc[1][0], ly/2):
+    if np.isclose(yloc[1][0], ly):
         q0 = 1
         xeta = 1
-    elif yloc[0][0] < ly/2 < yloc[1][0]:
-        q0 = 1
-        xeta = -1 + 2 * (ly/2 - yloc[0][0]) / (yloc[1][0] - yloc[0][0])
+    # elif yloc[0][0] < ly < yloc[1][0]:
+    #     q0 = 1
+    #     xeta = -1 + 2 * (ly/2 - yloc[0][0]) / (yloc[1][0] - yloc[0][0])
     else:
         xeta = 0
         q0 = 0
@@ -110,15 +110,14 @@ if reqN is None:
 N, Nx, Ny = mind.get_lagrange_shape_function(zeta, eta)
 wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
 xxx = N.T @ wt
-w0 = np.array(w0) * 20 # scaling z so its visible on graph
+w0 = np.array(w0) * 5# scaling z so its visible on graph
 w0 = w0.reshape((ny + 1, nx + 1))
-print(w0)
 fig2 = plt.figure(figsize=(6, 6))
 ax = plt.axes(projection='3d')
 ax.plot_wireframe(X, Y, w0)
+ax.set_aspect('equal')
 ax.set_axis_off()
 ax.set_title("w0 is scaled to make graph look prettier")
-ax.set_aspect('equal')
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 w0 = np.array(w0).reshape((ny + 1, nx + 1))
 ax.contourf(X, Y, w0, 100, cmap='jet')

@@ -10,8 +10,8 @@ plt.style.use('dark_background')
 L = .1
 H = .001
 DIMENSION = 2
-nx = 14
-ny = 14
+nx = 18
+ny = 18
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity_trap(nx, ny, lx, ly)
@@ -101,7 +101,7 @@ wt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
 xxx = N.T @ wt
 w0 = -np.array(w0) * 100 / np.min(w0)
 w0 = w0.reshape((ny + 1, nx + 1))
-print(w0)
+
 fig = plt.figure(figsize=(6, 6))
 ax = plt.axes(projection='3d')
 ax.plot_wireframe(X, Y, w0)
