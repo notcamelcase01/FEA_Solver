@@ -11,6 +11,10 @@ plt.style.use('dark_background')
 H = L/100
 DIMENSION = 2
 # DISCRITIZATION OF HOLE
+"""
+PLEASE THIS DISCRITIZATION IS A BIT DELICATE TRY TO KEEP NUMER OF ELEMENTS ON HOLE LESS THAN BIG PLATE
+IT WOULD WORK REGARDLESS JUST IT ACTS UP SOMETIMES ALSO ALSO Hx,Hy > 1
+"""
 Hx = 2
 Hy = 2
 by_max = 0.3
@@ -42,6 +46,7 @@ for igp in range(len(weightOfGaussPts)):
 hole_elements = []
 
 for elm in range(numberOfElements):
+    KK = 1
     n = connectivityMatrix[elm][1:]
     xloc = []
     yloc = []
@@ -49,6 +54,11 @@ for elm in range(numberOfElements):
         xloc.append(nodalArray1[1][n[i]])
         yloc.append(nodalArray1[2][n[i]])
     if np.isnan(np.sum(xloc)) or np.isnan(np.sum(yloc)):
+        """
+        CHECKING IF ELEMENT IS IN HOLE
+        if THERE IS HOLE THEN STIFFNESS WILL BE 0 
+        """
+        KK = 0
         hole_elements.append(elm)
     xloc = []
     yloc = []
@@ -69,9 +79,9 @@ for elm in range(numberOfElements):
             Jinv = np.linalg.inv(J)
             T1 = np.zeros((8, 8))
             for pli in range(4):
-                T1 += sol.assemble_stiffness(Jinv, [2 * pli, 2*pli + 1], 8)
+                T1 += sol.assemble_2Dmat(Jinv, [2 * pli, 2 * pli + 1], 8)
             B1 = T1 @ mind.get_B1_matrix(Nx, Ny)
-            kloc += B1.T @ D1mat @ B1 * weightOfGaussPts[xgp] * weightOfGaussPts[ygp] * np.linalg.det(J)
+            kloc +=  B1.T @ D1mat @ B1 * weightOfGaussPts[xgp] * weightOfGaussPts[ygp] * np.linalg.det(J)
             floc += (mind.get_N_matrix(N).T @ np.array([[0, 0, 0, 0, -1000000]]).T) * weightOfGaussPts[xgp] * weightOfGaussPts[ygp] * np.linalg.det(J)
     for xgp in range(len(reduced_wts)):
         for ygp in range(len(reduced_wts)):
@@ -83,33 +93,27 @@ for elm in range(numberOfElements):
             J[1, 1] = Ny.T @ yloc
             Jinv = np.linalg.inv(J)
             T2 = np.zeros((4, 4))
-            T2 += sol.assemble_stiffness(Jinv, [2 * 1, 2 * 1 + 1], 4)
+            T2 += sol.assemble_2Dmat(Jinv, [2 * 1, 2 * 1 + 1], 4)
             T2[0, 0] = 1
             T2[1, 1] = 1
             B2 = T2 @ mind.get_B2_matrix(N, Nx, Ny)
             kloc += B2.T @ D2mat @ B2 * reduced_wts[xgp] * reduced_wts[ygp] * np.linalg.det(J)
     iv = mind.get_assembly_vector(DOF, n)
-    kk = 1
-    if elm in hole_elements:
-        kk = 0
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
-    KG += sol.assemble_stiffness(kloc, iv, numberOfNodes * DOF)
+    KG += KK * sol.assemble_2Dmat(kloc, iv, numberOfNodes * DOF)
 
 
 print(hole_elements)
-iv = sol.get_assembly_vector(DOF, hole_elements)
-for i in iv:
-    fg[i] = 0
-
+# iv = sol.get_assembly_vector(DOF, hole_elements)
+# for i in iv:
+#     fg[i] = 0
 encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1], lx)) | (np.isclose(nodalArray[2], 0)) | (np.isclose(nodalArray[2], ly)))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
-
-
 for i in iv:
     KG, fg = sol.impose_boundary_condition(KG, fg, i, 0)
 
-
 u = sol.get_displacement_vector(KG, fg)
+
 # iv = sol.get_assembly_vector(DOF, [30])
 # for i in iv:
 #     u[i] = 0

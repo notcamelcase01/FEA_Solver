@@ -85,8 +85,16 @@ def get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_
     hxc = (bx_min + bx_max) / 2
     hyc = (by_min + by_max) / 2
     nybelow = math.ceil(by_min * (ny+1) / ly)
+    if nybelow == 0:
+        nybelow += 1
+    if nybelow == ny:
+        nybelow +=- 1
     nyabove = ny - nybelow
     nxbelow = math.ceil(bx_min * (nx+1) / lx)
+    if nxbelow == 0:
+        nxbelow += 1
+    if nxbelow == nx:
+        nxbelow += - 1
     nxabove = nx - nxbelow
     nelm = (nx + Hx) * (ny + Hy)
     nnod = (nx + Hx + 1) * (1 + ny + Hy)
@@ -106,6 +114,7 @@ def get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_
 
     icon = np.zeros((5, nelm), dtype=np.int32)
     icon[0, :] = np.arange(0, nelm, 1)
+    iewr = np.where((node_array[1] != width) & (node_array[2] != height))[0]
     icon[1, :] = np.where((node_array[1] != width) & (node_array[2] != height))[0]
     icon[2, :] = icon[1, :] + nx + Hx + 1
     icon[3, :] = icon[1, :] + 1
@@ -129,15 +138,15 @@ def get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_
 if __name__ == "__main__":
     L = 1
     # DISCRITIZATION OF HOLE
-    Hx = 5
-    Hy = 5
+    Hx = 2
+    Hy = 6
     by_max = 0.3
     by_min = 0.1
     bx_max = 0.9
     bx_min = 0.7
     # DISCRITIZATION OF PLATE
-    nx = 8
-    ny = 8
+    nx = 6
+    ny = 3
     lx = L
     ly = L
 

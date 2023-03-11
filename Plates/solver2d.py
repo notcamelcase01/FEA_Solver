@@ -2,13 +2,13 @@ import numpy as np
 import keywords as param
 
 
-def assemble_stiffness(kloc, iv, n, v=None):
+def assemble_2Dmat(kloc, iv, n, v=None):
     """
-    :param v: nodes where stiffness are to be places
-    :param kloc: local stiffness matrix
+    :param v: nodes where stiffness/mat are to be places
+    :param kloc: local stiffness matrix/2d mat
     :param iv: nodes where stiffness are to be placed
     :param n: DOF*number of nodes
-    :return: stiffness matrix to be added to global stiffness
+    :return: stiffness matrix/ 2dmat to be added to global stiffness/ big 2d mat
     """
     # TODO: Remove if statement (make another function if this ain't resolved)
     if v is None:
@@ -61,38 +61,6 @@ def init_stiffness_force(nnod, DOF):
     return np.zeros((nnod * DOF, nnod * DOF)), np.zeros((nnod * DOF, 1))
 
 
-def get_hermite_fn(gp, J):
-    """
-    :param gp: eta or gauss points or natural coordinate
-    :param J: jacobian
-    :return: (H,H")
-    """
-    Nmat = np.array([.25 * (gp + 2) * (1 - gp) ** 2, J * .25 * (gp + 1) * (1 - gp) ** 2,
-                     .25 * (-gp + 2) * (1 + gp) ** 2, J * .25 * (gp - 1) * (1 + gp) ** 2])
-    Bmat = (1 / J ** 2) * np.array([1.5 * gp, (-.5 + 1.5 * gp) * J, -1.5 * gp, (.5 + 1.5 * gp) * J])
-    return Nmat[:, None], Bmat[:, None]
-
-
-def get_lagrange_fn(gp, J, element_type):
-    """
-    :param gp: gauss point
-    :param J: jacobian
-    :param element_type: element_type 2=LINEAR
-    :return: (L,L')
-    """
-    # TODO: use loop instead of if statements
-    if element_type == param.ElementType.LINEAR:
-        Nmat = np.array([.5 * (1 - gp), .5 * (1 + gp)])
-        Bmat = (1 / J) * np.array([-.5, .5])
-    elif element_type == param.ElementType.QUAD:
-        Nmat = np.array([0.5 * (-1 + gp) * gp, (-gp + 1) * (gp + 1), 0.5 * gp * (1 + gp)])
-        Bmat = (1 / J) * np.array([0.5 * (-1 + 2 * gp), -2 * gp, 0.5 * (1 + 2 * gp)])
-    else:
-        raise Exception("Uhm, This is wendy's, we don't, more than 3 node points here")
-
-    return Nmat[:, None], Bmat[:, None]
-
-
 def impose_boundary_condition(K, f, ibc, bc):
     """
     :param K: Stiffness matrix
@@ -120,8 +88,10 @@ def get_displacement_vector(K, f):
         return np.linalg.inv(K) @ f
     except np.linalg.LinAlgError as e:
         if 'Singular matrix' in str(e):
-            print("STOP INTING")
-            return 0
+            print("------------------")
+            i = np.eye(K.shape[0])
+            pin = np.linalg.lstsq(K, i, rcond=None)[0]
+            return pin @ f
         else:
             raise
 
@@ -138,3 +108,19 @@ def get_assembly_vector(DOF, n):
             iv.append(DOF * i + j)
     return iv
 
+
+def get_node_from_cord(icon, position, nodalArray, nelm, nodePerElement):
+    for elm in range(nelm):
+        n = icon[elm][1:]
+        xloc = []
+        yloc = []
+        for i in range(nodePerElement):
+            xloc.append(nodalArray[1][n[i]])
+            yloc.append(nodalArray[2][n[i]])
+        if xloc[0] <= position[0] <= xloc[3] and yloc[0] <= position[1] <= yloc[3]:
+            eta = -1 + 2 * (position[1] - yloc[0]) / (yloc[3] - yloc[0])
+            zeta = -1 + 2 * (position[0] - xloc[0]) / (xloc[3] - xloc[0])
+            if np.isnan(np.sum(xloc)) or np.isnan(np.sum(yloc)):
+                return None, None, None
+            return n, zeta, eta
+    return None, None, None
