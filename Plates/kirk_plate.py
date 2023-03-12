@@ -11,10 +11,10 @@ plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 10
+nx = 8
 lx = L
 ly = L
-ny = 10
+ny = 8
 jx = lx/nx/2
 jy = ly/ny/2
 connectivityMatrix, nodalArray, (X0, Y0)  = gencon.get_2d_connectivity(nx, ny, L, L)
@@ -46,7 +46,7 @@ for elm in range(numberOfElements):
             N = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx, jy, True)
             B = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx, jy)
             kloc += B.T @ Dmat @ B * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy * jx
-            ASF =  N.T * 1 * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy * jx
+            ASF =  N.T @ np.array([[0, 0, -1000000]]).T * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy * jx
             floc += ASF
     iv = sol.get_assembly_vector(DOF, n)
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)

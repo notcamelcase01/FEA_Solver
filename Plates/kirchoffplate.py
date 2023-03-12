@@ -85,92 +85,6 @@ def get_lagrange_shape_function(x_gp, y_gp, jx, jy, element_type=2, seq=((-1, -1
     return Lmat[:, None], Lmatx[:, None], Lmaty[:, None]
 
 
-def get_hermite_shape_function(x_gp, y_gp, element_type=2, seq=((-1, -1), (-1, 1), (1, -1), (1, 1))):
-    """
-    :param Jy: Jy
-    :param Jx: Jx
-    :param seq: order in which nodes are picked, currently in "N" shape starting from bottom left
-    :param x_gp: x coord
-    :param y_gp: y coord
-    :param element_type: element type (default linear)
-    :return: lagrange fn for Q4 element
-    """
-    Nmat = np.zeros(len(seq))
-    Nmat_1 = np.zeros(len(seq))
-    Nmat_2 = np.zeros(len(seq))
-    Nmat_3 = np.zeros(len(seq))
-    for i in range(len(seq)):
-        Nmat[i] = 1 / 16 * (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2) * (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2)
-        Nmat_1[i] = -1 / 16  * seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1) * (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2)
-        Nmat_2[i] = -1 / 16  * seq[i][1] * (y_gp + seq[i][1]) ** 2 * (y_gp * seq[i][1] - 1) * (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2)
-        Nmat_3[i] = 1 / 16 * seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1) * seq[i][1] * (y_gp + seq[i][1]) ** 2 * (y_gp * seq[i][1] - 1)
-    return Nmat[:, None], Nmat_1[:, None], Nmat_2[:, None], Nmat_3[:, None]
-
-
-def get_hermite_shape_function_derivative_xx(x_gp, y_gp, J, element_type=2, seq=((-1, -1), (-1, 1), (1, -1), (1, 1))):
-    """
-    :param Jx: d(x_gp)/dx
-    :param seq: order in which nodes are picked, currently in "N" shape starting from bottom left
-    :param x_gp: x coord
-    :param y_gp: y coord
-    :param element_type: element type (default linear)
-    :return: lagrange fn for Q4 element
-    """
-    Nmatxx = np.zeros(len(seq))
-    Nmatxx_1 = np.zeros(len(seq))
-    Nmatxx_2 = np.zeros(len(seq))
-    Nmatxx_3 = np.zeros(len(seq))
-    for i in range(len(seq)):
-        Nmatxx[i] =   1 / 8 /J * (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2) * ((x_gp * seq[i][0] - 2) + 2 * (x_gp + seq[i][0]) * seq[i][0])
-        Nmatxx_1[i] = -1 / 8/ J *  (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2) * (seq[i][0] * (x_gp * seq[i][0] - 1) + 2 * (x_gp + seq[i][0]) * seq[i][0] * seq[i][0])
-        Nmatxx_2[i] = -1 / 8 /J  *  (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2) * (seq[i][1] * (y_gp * seq[i][1] - 1) + 2 * (y_gp + seq[i][1]) * seq[i][1] * seq[i][1])
-        Nmatxx_3[i] = 1 / 8 / J * (seq[i][0] * (x_gp * seq[i][0] - 1) + 2 * (x_gp + seq[i][0]) * seq[i][0] * seq[i][0]) * seq[i][1] * (y_gp + seq[i][1]) ** 2 * (y_gp * seq[i][1] - 1)
-    return Nmatxx[:, None], Nmatxx_1[:, None], Nmatxx_2[:, None], Nmatxx_3[:, None]
-
-
-def get_hermite_shape_function_derivative_yy(x_gp, y_gp,J ,element_type=2, seq=((-1, -1), (-1, 1), (1, -1), (1, 1))):
-    """
-    :param Jy: d(y_gp)/dy
-    :param seq: order in which nodes are picked, currently in "N" shape starting from bottom left
-    :param x_gp: x coord
-    :param y_gp: y coord
-    :param element_type: element type (default linear)
-    :return: lagrange fn for Q4 element
-    """
-    Nmatyy = np.zeros(len(seq))
-    Nmatyy_1 = np.zeros(len(seq))
-    Nmatyy_2 = np.zeros(len(seq))
-    Nmatyy_3 = np.zeros(len(seq))
-    for i in range(len(seq)):
-        Nmatyy[i] =  1 / 8 /J * (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2) * ((y_gp * seq[i][1] - 2) + 2 * (y_gp + seq[i][1]) * seq[i][1])
-        Nmatyy_1[i] = -1 / 8 /J* seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1) * ((y_gp * seq[i][1] - 2) + 2 * (y_gp + seq[i][1]) * seq[i][1])
-        Nmatyy_2[i] = -1 / 8 /J *  (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2) * (seq[i][1] * (y_gp * seq[i][1] - 1) + 2 * (y_gp + seq[i][1]) * seq[i][1] * seq[i][1])
-        Nmatyy_3[i] = 1 / 8 /J * (seq[i][1] * (y_gp * seq[i][1] - 1) + 2 * (y_gp + seq[i][1]) * seq[i][1] * seq[i][1]) * seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1)
-    return Nmatyy[:, None], Nmatyy_1[:, None], Nmatyy_2[:, None], Nmatyy_3[:, None]
-
-
-def get_hermite_shape_function_derivative_xy(x_gp, y_gp, J, element_type=2, seq=((-1, -1), (-1, 1), (1, -1), (1, 1))):
-    """
-    :param Jy: d(y_gp)/dy
-    :param Jx: d(x_gp)/dx
-    :param seq: order in which nodes are picked, currently in "N" shape starting from bottom left
-    :param x_gp: x coord
-    :param y_gp: y coord
-    :param element_type: element type (default linear)
-    :return: lagrange fn for Q4 element
-    """
-    Nmatxy = np.zeros(len(seq))
-    Nmatxy_1 = np.zeros(len(seq))
-    Nmatxy_2 = np.zeros(len(seq))
-    Nmatxy_3 = np.zeros(len(seq))
-    for i in range(len(seq)):
-        Nmatxy[i] = 1 / 16 / J * (2 * (x_gp + seq[i][0]) * (x_gp * seq[i][0] - 2) + (x_gp + seq[i][0]) ** 2 * seq[i][0]) * (2 * (y_gp + seq[i][1]) * (y_gp * seq[i][1] - 2) + (y_gp + seq[i][1]) ** 2 * seq[i][1])
-        Nmatxy_1[i] = -1 / 16/ J * (2 * (y_gp + seq[i][1]) * (y_gp * seq[i][1] - 2) + (y_gp + seq[i][1]) ** 2 * seq[i][1]) * seq[i][0] * (2 * (x_gp + seq[i][0]) * (x_gp * seq[i][0] - 1) + (x_gp + seq[i][0]) ** 2 * seq[i][0])
-        Nmatxy_2[i] = -1 / 16/ J * seq[i][1] * (2 * (y_gp + seq[i][1]) * (y_gp * seq[i][1] - 1) + (y_gp + seq[i][1]) ** 2 * seq[i][1]) *  (2 * (x_gp + seq[i][0]) * (x_gp * seq[i][0] - 2) + (x_gp + seq[i][0]) ** 2 * seq[i][0])
-        Nmatxy_3[i] = 1 / 16/ J * seq[i][0] * seq[i][1] * (2 * (x_gp + seq[i][0]) * (x_gp * seq[i][0] - 1) + (x_gp + seq[i][0]) ** 2 * seq[i][0]) * (2 * (y_gp + seq[i][1]) * (y_gp * seq[i][1] - 1) + (y_gp + seq[i][1]) ** 2 * seq[i][1])
-    return Nmatxy[:, None], Nmatxy_1[:, None], Nmatxy_2[:, None], Nmatxy_3[:, None]
-
-
 def get_assembly_vector(DOF, n):
     """
     :param DOF: dof
@@ -222,22 +136,19 @@ def get_BorN_F(x, y, jx, jy, needN = False, justN = False):
                    -(jy / 4) * (1 - y - y ** 2 + y ** 3),
                    0.25 * (2 + 3 * y - y ** 3),
                    -(jy / 4) * (-1 - y + y ** 2 + y ** 3)])[:, None]
-    N1 = (Nx[0:2] @ Ny[0:2].T).T.reshape(4, 1)
-    N2 = (Nx[2:4] @ Ny[0:2].T).T.reshape(4, 1)
-    N3 = (Nx[2:4] @ Ny[2:4].T).T.reshape(4, 1)
-    N4 = (Nx[0:2] @ Ny[2:4].T).T.reshape(4, 1)
+    N1 = (Nx[0:2] @ Ny[0:2].T).T.reshape(4,)
+    N2 = (Nx[2:4] @ Ny[0:2].T).T.reshape(4,)
+    N3 = (Nx[2:4] @ Ny[2:4].T).T.reshape(4,)
+    N4 = (Nx[0:2] @ Ny[2:4].T).T.reshape(4,)
     H = [N1, N2, N3, N4]
     if justN:
-        return N1, N2, N3, N4
+        return N1[:, None], N2[:, None], N3[:, None], N4[:, None]
     if needN:
-        B1 = np.zeros((1, 24))
+        B1 = np.zeros((3, 24))
         for k in range(4):
             B1[0, 6 * k] = L[k][0]
-            B1[0, 6 * k + 1] = L[k][0]
-            B1[0, 6 * k + 2] = H[k][0]
-            B1[0, 6 * k + 3] = H[k][1]
-            B1[0, 6 * k + 4] = H[k][2]
-            B1[0, 6 * k + 5] = H[k][3]
+            B1[1, 6 * k + 1] = L[k][0]
+            B1[2, 6 * k + 2:6 * k + 6] = H[k]
         return B1
         # return np.array([[L[0][0], L[1][0], L[2][0], L[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         #              [0, 0, 0, 0, L[0][0], L[1][0], L[2][0], L[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -290,18 +201,9 @@ def get_BorN_F(x, y, jx, jy, needN = False, justN = False):
         B1[1, 6 * k] = Ly[k][0]
         B1[2, 6 * k + 1] = Lx[k][0]
         B1[3, 6 * k + 1] = Ly[k][0]
-        B1[4, 6 * k + 2] = Hxx[k][0]
-        B1[4, 6 * k + 3] = Hxx[k][1]
-        B1[4, 6 * k + 4] = Hxx[k][2]
-        B1[4, 6 * k + 5] = Hxx[k][3]
-        B1[5, 6 * k + 2] = Hyy[k][0]
-        B1[5, 6 * k + 3] = Hyy[k][1]
-        B1[5, 6 * k + 4] = Hyy[k][2]
-        B1[5, 6 * k + 5] = Hyy[k][3]
-        B1[6, 6 * k + 2] = Hxy[k][0]
-        B1[6, 6 * k + 3] = Hxy[k][1]
-        B1[6, 6 * k + 4] = Hxy[k][2]
-        B1[6, 6 * k + 5] = Hxy[k][3]
+        B1[4, 6 * k + 2:6 * k + 6] = Hxx[k]
+        B1[5, 6 * k + 2:6 * k + 6] = Hyy[k]
+        B1[6, 6 * k + 2:6 * k + 6] = Hxy[k]
     return B1
 
     # return np.array(
