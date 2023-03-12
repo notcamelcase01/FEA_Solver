@@ -30,7 +30,7 @@ def get_2d_connectivity(nx, ny, lx, ly):
     return icon, node_array, np.meshgrid(x, y)
 
 
-def get_2d_connectivity_trap(nx, ny, lx, ly):
+def get_2d_connectivit(nx, ny, lx, ly):
     """
     :param lx: total width
     :param ly: total height
