@@ -16,15 +16,15 @@ DIMENSION = 2
 PLEASE THIS DISCRITIZATION IS A BIT DELICATE TRY TO KEEP NUMER OF ELEMENTS ON HOLE LESS THAN BIG PLATE
 IT WOULD WORK REGARDLESS JUST IT ACTS UP SOMETIMES ALSO ALSO Hx,Hy > 1
 """
-Hx = 2
-Hy = 2
+Hx = 4
+Hy = 4
 by_max = 0.3
 by_min = 0.1
 bx_max = 0.9
 bx_min = 0.7
 # DISCRITIZATION OF PLATE
-nx = 8
-ny = 8
+nx = 12
+ny = 12
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X, Y), nodalArray1 = gencon.get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_min)
@@ -99,7 +99,7 @@ for elm in range(numberOfElements):
             B2 = T2 @ mind.get_B2_matrix(N, Nx, Ny)
             kloc += B2.T @ D2mat @ B2 * reduced_wts[xgp] * reduced_wts[ygp] * np.linalg.det(J)
     iv = mind.get_assembly_vector(DOF, n)
-    fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
+    fg += KK * sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += KK * sol.assemble_2Dmat(kloc, iv, numberOfNodes * DOF)
 
 
