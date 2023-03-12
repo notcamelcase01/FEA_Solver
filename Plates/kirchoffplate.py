@@ -126,6 +126,7 @@ def get_2d_connectivity(nx, ny, lx, ly):
     icon = icon.transpose()
     return icon, node_array, np.meshgrid(x, y)
 
+
 def get_BorN_F(x, y, jx, jy, needN = False, justN = False):
     L, Lx, Ly = get_lagrange_shape_function(x, y, jx, jy)
     Nx = np.array([0.25 * (2 - 3 * x + x ** 3),
@@ -150,9 +151,6 @@ def get_BorN_F(x, y, jx, jy, needN = False, justN = False):
             B1[1, 6 * k + 1] = L[k][0]
             B1[2, 6 * k + 2:6 * k + 6] = H[k]
         return B1
-        # return np.array([[L[0][0], L[1][0], L[2][0], L[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        #              [0, 0, 0, 0, L[0][0], L[1][0], L[2][0], L[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        #              [0, 0, 0, 0, 0, 0, 0, 0, N1[0][0], N1[1][0], N1[2][0], N1[3][0], N2[0][0], N2[1][0], N2[2][0], N2[3][0], N3[0][0], N3[1][0], N3[2][0], N3[3][0], N4[0][0], N4[1][0], N4[2][0], N4[3][0]]])
 
     dNx = np.array([0.25 * (-3 + 3 * x ** 2),
                   -(jx / 4) * (-1 - 2 * x + 3 * x ** 2),
@@ -206,14 +204,46 @@ def get_BorN_F(x, y, jx, jy, needN = False, justN = False):
         B1[6, 6 * k + 2:6 * k + 6] = Hxy[k]
     return B1
 
-    # return np.array(
-    #     [[Lx[0][0], Lx[1][0], Lx[2][0], Lx[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #      [Ly[0][0], Ly[1][0], Ly[2][0], Ly[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #      [0, 0, 0, 0, Lx[0][0], Lx[1][0], Lx[2][0], Lx[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #      [0, 0, 0, 0, Ly[0][0], Ly[1][0], Ly[2][0], Ly[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, Nxx[0][0], Nxx[1][0], Nxx[2][0], Nxx[3][0], N1xx[0][0], N1xx[1][0], N1xx[2][0], N1xx[3][0], N2xx[0][0], N2xx[1][0], N2xx[2][0], N2xx[3][0], N3xx[0][0], N3xx[1][0], N3xx[2][0], N3xx[3][0]],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, Nyy[0][0], Nyy[1][0], Nyy[2][0], Nyy[3][0], N1yy[0][0], N1yy[1][0], N1yy[2][0], N1yy[3][0], N2yy[0][0], N2yy[1][0], N2yy[2][0], N2yy[3][0], N3yy[0][0], N3yy[1][0], N3yy[2][0], N3yy[3][0]],
-    #      [0, 0, 0, 0, 0, 0, 0, 0, Nxy[0][0], Nxy[1][0], Nxy[2][0], Nxy[3][0], N1xy[0][0], N1xy[1][0], N1xy[2][0], N1xy[3][0], N2xy[0][0], N2xy[1][0], N2xy[2][0], N2xy[3][0], N3xy[0][0], N3xy[1][0], N3xy[2][0], N3xy[3][0]]])
+
+def get_node_from_cord(icon, position, nodalArray, nelm, nodePerElement):
+    for elm in range(nelm):
+        n = icon[elm][1:]
+        xloc = []
+        yloc = []
+        for i in range(nodePerElement):
+            xloc.append(nodalArray[1][n[i]])
+            yloc.append(nodalArray[2][n[i]])
+        if xloc[0] <= position[0] <= xloc[2] and yloc[0] <= position[1] <= yloc[2]:
+            eta = -1 + 2 * (position[1] - yloc[0]) / (yloc[2] - yloc[0])
+            zeta = -1 + 2 * (position[0] - xloc[0]) / (xloc[2] - xloc[0])
+            if np.isnan(np.sum(xloc)) or np.isnan(np.sum(yloc)):
+                return None, None, None
+            jx = (xloc[1] - xloc[0]) / 2
+            jy = (yloc[2] - yloc[0]) / 2
+            return n, zeta, eta, jx, jy
+    return None, None, None
+
+
+def get_hermite_shape_function(x_gp, y_gp, jx, jy, element_type=2, seq=((-1, -1), (1, -1), (1, 1), (-1, 1))):
+    """
+    :param Jy: Jy
+    :param Jx: Jx
+    :param seq: order in which nodes are picked, currently in "N" shape starting from bottom left
+    :param x_gp: x coord
+    :param y_gp: y coord
+    :param element_type: element type (default linear)
+    :return: lagrange fn for Q4 element
+    """
+    Nmat = np.zeros(len(seq))
+    Nmat_1 = np.zeros(len(seq))
+    Nmat_2 = np.zeros(len(seq))
+    Nmat_3 = np.zeros(len(seq))
+    for i in range(len(seq)):
+        Nmat[i] = 1 / 16 * (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2) * (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2)
+        Nmat_1[i] = -jx / 16  * seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1) * (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2)
+        Nmat_2[i] = -jy / 16  * seq[i][1] * (y_gp + seq[i][1]) ** 2 * (y_gp * seq[i][1] - 1) * (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2)
+        Nmat_3[i] = jx * jy / 16 * seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1) * seq[i][1] * (y_gp + seq[i][1]) ** 2 * (y_gp * seq[i][1] - 1)
+    return [Nmat, Nmat_1, Nmat_2, Nmat_3]
 
 
 if __name__ == "__main__":
