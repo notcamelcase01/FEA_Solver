@@ -99,7 +99,7 @@ for elm in range(numberOfElements):
             B2 = T2 @ mind.get_B2_matrix(N, Nx, Ny)
             kloc += B2.T @ D2mat @ B2 * reduced_wts[xgp] * reduced_wts[ygp] * np.linalg.det(J)
     iv = mind.get_assembly_vector(DOF, n)
-    fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
+    fg += KK * sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += KK * sol.assemble_2Dmat(kloc, iv, numberOfNodes * DOF)
 
 
