@@ -10,8 +10,8 @@ plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 4
-ny = 4
+nx = 10
+ny = 10
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2d_connectivity(nx, ny, lx, ly)
@@ -93,6 +93,7 @@ for i in range(numberOfNodes):
     theta_x.append(u[DOF * i + 2][0])
     theta_y.append(u[DOF * i + 3][0])
     w0.append(u[DOF * i + 4][0])
+oi = min(w0)
 reqN, zeta, eta = sol.get_node_from_cord(connectivityMatrix, (0.5, 0.5), nodalArray, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
@@ -107,7 +108,7 @@ ax.plot_surface(X, Y, w0)
 ax.set_aspect('equal')
 fig, ax = plt.subplots(1, 1, figsize=(6, 6))
 ax.contourf(X, Y, w0, 100, cmap='jet')
-ax.set_title('Contour Plot, w_A = {x}'.format(x = xxx))
+ax.set_title('Contour Plot, w_A = {x}'.format(x = oi))
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
 ax.set_aspect('equal')

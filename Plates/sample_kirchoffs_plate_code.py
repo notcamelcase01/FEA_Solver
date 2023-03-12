@@ -3,20 +3,20 @@ import solver2d as sol
 import matplotlib.pyplot as plt
 from parameters import L
 import keywords as param
-from Plates import gencon as gencon
 import kirchoffplate as kirk
+from mpl_toolkits.mplot3d import Axes3D
 
 plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 4
+nx = 10
+ny = 10
 lx = L
 ly = L
-ny = 4
 jx = lx/nx/2
 jy = ly/ny/2
-connectivityMatrix, nodalArray, (X0, Y0)  = gencon.get_2d_connectivity(nx, ny, L, L)
+connectivityMatrix, nodalArray, (X0, Y0)  = kirk.get_2d_connectivity(nx, ny, L, L)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 6
 element_type = param.ElementType.LINEAR
@@ -39,20 +39,23 @@ for elm in range(numberOfElements):
     for i in range(element_type**DIMENSION):
         xloc.append(nodalArray[1][n[i]])
         yloc.append(nodalArray[2][n[i]])
+    jx = (xloc[1] - xloc[0])/2
+    jy = (yloc[2] - yloc[0])/2
     kloc, floc = sol.init_stiffness_force(element_type**DIMENSION, DOF)
     for x_igp in range(len(weightOfGaussPts)):
         for y_igp in range(len(weightOfGaussPts)):
-            N = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx * 2, jy * 2, jx, jy, True)
-            B = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx * 2, jy * 2, jx, jy)
-            kloc += B.T @ Dmat @ B * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy*jx
-            floc += N.T @ np.array([0, 0, -1000000])[:, None] * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy*jx
-    iv = kirk.get_assembly_vector(DOF, n)
+            N = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx, jy, True)
+            B = kirk.get_BorN_F(gaussPts[x_igp], gaussPts[y_igp], jx, jy)
+            kloc += B.T @ Dmat @ B * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy * jx
+            ASF =  N.T @ np.array([[0, 0, -1000000]]).T * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * jy * jx
+            floc += ASF
+    iv = sol.get_assembly_vector(DOF, n)
     fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
     KG += sol.assemble_2Dmat(kloc, iv, numberOfNodes * DOF)
 
 encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1], lx)) | (np.isclose(nodalArray[2], 0)) | (np.isclose(nodalArray[2], ly)))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
-
+print(np.sum(fg))
 for ibc in iv:
     KG, fg = sol.impose_boundary_condition(KG, fg, ibc, 0)
 
@@ -67,22 +70,31 @@ for i in range(numberOfNodes):
     u0.append(u[DOF * i][0])
     v0.append(u[DOF * i + 1][0])
     w0.append(u[DOF * i + 2][0])
-reqN, zeta, eta = sol.get_node_from_cord(connectivityMatrix, (0.7, 0.3), nodalArray, numberOfElements, nodePerElement)
+reqN, zeta, eta, jx, jy = kirk.get_node_from_cord(connectivityMatrix, (0.5, 0.5), nodalArray, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
-Nmat, Nmat1, Nmat2, Nmat3 = kirk.get_BorN_F(eta, zeta, 2 * jx, 2 * jy, jx, jy, justN=True)
+Nmat, Nmat1, Nmat2, Nmat3 = kirk.get_hermite_shape_function(eta, zeta, jx, jy)
 wt = np.array([u[DOF * i + 2][0] for i in reqN])[:, None]
 wxt = np.array([u[DOF * i + 3][0] for i in reqN])[:, None]
 wyt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
 wxyt = np.array([u[DOF * i + 5][0] for i in reqN])[:, None]
 
-xxx = Nmat.T @ wt + Nmat1.T @ wxt + Nmat2.T @ wyt + Nmat3.T @ wxyt
-fig, ax = plt.subplots(1, 1, figsize=(6, 6))
-w0 = np.array(w0).reshape((ny + 1, nx + 1))
+xxx = Nmat.T @ wt + Nmat1.T @ wxt + Nmat2.T @ wyt  + Nmat3.T @ wxyt
+w0 = - np.array(w0) * 0.3 / np.min(w0)
+w0 = w0.reshape((ny + 1, nx + 1))
+fig = plt.figure(figsize=(6, 6))
+ax = plt.axes(projection='3d')
+#w0 = - np.array(w0) * 1 / np.min(w0) # Scaled w to make it look better
+print(w0)
+
+ax.plot_wireframe(X0, Y0, w0)
+ax.set_title("w0 is scaled to make graph look prettier")
+ax.set_axis_off()
+fig2, ax = plt.subplots(1, 1, figsize=(6, 6))
+
 ax.contourf(X0, Y0, w0, 70, cmap='jet')
 ax.set_title('Contour Plot, w_A = {x}'.format(x = xxx))
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
 ax.set_aspect('equal')
-print(w0)
 plt.show()
