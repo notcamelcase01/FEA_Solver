@@ -1,5 +1,5 @@
 import numpy as np
-from parameters import  G, Eb, mu
+from parameters import  G, Eb, mu, k
 
 def get_z1_matrix(z):
     return np.array([[1, 0, 0, 0, z, 0, 0, 0],
@@ -48,7 +48,7 @@ def get_C1_matrix():
                           [0, 0, (1 - mu)/2]])
 
 def get_C2_matrix():
-    return np.array([[G, 0],
+    return k * np.array([[G, 0],
                      [0, G]])
 
 
