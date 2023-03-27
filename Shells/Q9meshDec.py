@@ -1,5 +1,5 @@
 import  numpy as np
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
 def get_2D_connectivity_Q9(nx, ny, lx, ly):
     """
@@ -38,10 +38,14 @@ def get_2D_connectivity_Q9(nx, ny, lx, ly):
     for i in range(nnod):
         ax1.text(node_array[1][i], node_array[2][i], str(node_array[0][i]), fontsize=6)
     for i in range(nelm):
+        ax1.plot([node_array[1][icon[i][1]], node_array[1][icon[i][3]]], [node_array[2][icon[i][1]], node_array[2][icon[i][3]]],'-k')
+        ax1.plot([node_array[1][icon[i][1]], node_array[1][icon[i][7]]], [node_array[2][icon[i][1]], node_array[2][icon[i][7]]],'-k')
+        ax1.plot([node_array[1][icon[i][5]], node_array[1][icon[i][7]]], [node_array[2][icon[i][5]], node_array[2][icon[i][7]]],'-k')
+        ax1.plot([node_array[1][icon[i][5]], node_array[1][icon[i][3]]], [node_array[2][icon[i][5]], node_array[2][icon[i][3]]],'-k')
         ax1.text(0.4 * node_array[1][icon[i][1]] + 0.6 * node_array[1][icon[i][9]], 0.4 * node_array[2][icon[i][1]] + 0.6 * node_array[2][icon[i][9]], str(icon[i][0]),
                  fontsize=10, color="red")
     ax1.axis("equal")
-    ax1.set_xlabel("Elements in red, nodes in white")
+    ax1.set_xlabel("Elements in red, nodes in blak")
     ax1.set_title(str(nx) + "x" + str(ny) + " mesh with " + str(nnod) + " nodes")
     columns = ("Element", "#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9")
     ax2.table(cellText=icon, colLabels=columns, loc="center")
