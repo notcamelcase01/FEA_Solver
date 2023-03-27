@@ -155,7 +155,7 @@ def get_2D_connectivity_Q9(nx, ny, lx, ly):
     icon = np.zeros((10, nelm), dtype=np.int32)
     icon[0, :] = np.arange(0, nelm, 1)
     for i in range(nelm):
-        icon[1, i]  =  2 * i + (2 * i) // (2 * nx)
+        icon[1, i]  =  2 * i + (2 * i) // (2 * nx)  * (2 + 2 * nx)
     icon[2, :] = icon[1, :] + 1
     icon[3, :] = icon[2, :] + 1
     icon[4, :] = icon[3, :] + (2 * nx + 1)
