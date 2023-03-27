@@ -18,7 +18,7 @@ def get_2D_connectivity_Q9(nx, ny, lx, ly):
     y = np.linspace(0, height, (2 * ny + 1))
     x_1, y_1 = np.meshgrid(x, y)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 9))
-    ax1.scatter(x_1, y_1)
+    ax1.scatter(x_1, y_1, s=8)
     x_1 = x_1.reshape(1, nnod)[0]
     y_1 = y_1.reshape(1, nnod)[0]
     node_array = np.array([np.arange(0, nnod, 1, dtype=np.int32), x_1, y_1])
