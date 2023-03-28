@@ -16,10 +16,11 @@ lx = a
 ly = b
 print(a*b)
 element_type = param.ElementType.QUADRATIC
+OVERRIDE_REDUCED_INTEGRATION = False
+
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2D_connectivity_Q9(nx, ny, lx, ly, element_type)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 5
-OVERRIDE_REDUCED_INTEGRATION = False
 GAUSS_POINTS_REQ = 3
 numberOfNodes = nodalArray.shape[1]
 weightOfGaussPts, gaussPts = sol.init_gauss_points(GAUSS_POINTS_REQ)
