@@ -14,7 +14,7 @@ nx = 10
 ny = 10
 lx = a
 ly = b
-element_type = param.ElementType.QUADRATIC
+element_type = param.ElementType.Q9
 OVERRIDE_REDUCED_INTEGRATION = False
 
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2D_connectivity_Q9(nx, ny, lx, ly, element_type)
@@ -24,7 +24,7 @@ GAUSS_POINTS_REQ = 2
 numberOfNodes = nodalArray.shape[1]
 weightOfGaussPts, gaussPts = sol.init_gauss_points(GAUSS_POINTS_REQ)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and
-                                                        element_type == param.ElementType.LINEAR) else GAUSS_POINTS_REQ)
+                                                        element_type == param.ElementType.Q4) else GAUSS_POINTS_REQ)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
 nodePerElement = element_type ** DIMENSION
 D1mat = np.zeros((9, 9))

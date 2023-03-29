@@ -18,6 +18,8 @@ def get_lagrange_shape_function(x, y, element_type=2):
             N[i] = 0.25 * (1 + seq[i][0] * x) * (1 + seq[i][1] * y)
             Nx[i] = 0.25 * (seq[i][0] * (1 + seq[i][1] * y))
             Ny[i] = 0.25 * (seq[i][1] * (1 + seq[i][0] * x))
+    else:
+        raise Exception("Uhm, This is wendy's, we don't, more than 3 nodes here")
     return N[:, None], Nx[:, None], Ny[:, None]
 
 def get_C1_matrix():

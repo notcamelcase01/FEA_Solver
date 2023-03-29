@@ -5,5 +5,5 @@ from enum import IntEnum
 
 
 class ElementType(IntEnum):
-    LINEAR = 2
-    QUADRATIC = 3
+    Q4 = 2
+    Q9 = 3
