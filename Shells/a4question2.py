@@ -10,11 +10,10 @@ plt.style.use('dark_background')
 
 H = h
 DIMENSION = 2
-nx = 6
-ny = 6
+nx = 10
+ny = 10
 lx = a
 ly = b
-print(a*b)
 element_type = param.ElementType.QUADRATIC
 OVERRIDE_REDUCED_INTEGRATION = False
 
