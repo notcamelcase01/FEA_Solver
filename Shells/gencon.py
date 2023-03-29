@@ -168,9 +168,9 @@ def get_2D_connectivity_Q9(nx, ny, lx, ly, element_type=3):
         icon[9, :] = icon[8, :] + 1
     elif element_type == 2:
         icon[1, :] = np.where((node_array[1] != width) & (node_array[2] != height))[0]
-        icon[2, :] = icon[1, :] + nx + 1
-        icon[3, :] = icon[1, :] + 1
-        icon[4, :] = icon[2, :] + 1
+        icon[2, :] = icon[1, :] + 1
+        icon[3, :] = icon[2, :] + nx +  1
+        icon[4, :] = icon[3, :] - 1
     else:
         raise Exception("Sir, this is wendy's, only till quad")
     icon = icon.transpose()

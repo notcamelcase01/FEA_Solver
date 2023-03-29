@@ -13,7 +13,7 @@ def get_lagrange_shape_function(x, y, element_type=2):
             Nx[i] = ((1.5 * xi[i]**2 - 1) * x * 2 + 0.5 * xi[i]) * ((1.5 * yi[i]**2 - 1) * y**2 + 0.5 * yi[i] * y + 1 - yi[i]**2)
             Ny[i] = ((1.5 * xi[i]**2 - 1) * x**2 + 0.5 * xi[i] * x + 1 - xi[i]**2) * ((1.5 * yi[i]**2 - 1) * y * 2 + 0.5 * yi[i])
     elif element_type == 2:
-        seq = ((-1, -1), (-1, 1), (1, -1), (1, 1))
+        seq = ((-1, -1), (1, -1), (1, 1), (-1, 1))
         for i in range(len(seq)):
             N[i] = 0.25 * (1 + seq[i][0] * x) * (1 + seq[i][1] * y)
             Nx[i] = 0.25 * (seq[i][0] * (1 + seq[i][1] * y))
@@ -44,8 +44,8 @@ def get_z1_matrix(z, Rx, Ry):
 
 
 def get_z2_matrix(Rx, Ry):
-    return np.array([[-1/Rx, 0, 0, 1, 0, 1],
-                     [0, -1/Ry, 1 ,0, 1, 0]])
+    return np.array([[-1/Rx, 0, 1, 0, 1, 0],
+                     [0, -1/Ry, 0 ,1, 0, 1]])
 
 
 
