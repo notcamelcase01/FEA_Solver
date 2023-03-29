@@ -19,21 +19,23 @@ def get_2D_connectivity_Q9(nx, ny, lx, ly):
     x_1, y_1 = np.meshgrid(x, y)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 9))
     ax1.scatter(x_1, y_1, s=8)
+    x_1 = x_1.T
+    y_1 = y_1.T
     x_1 = x_1.reshape(1, nnod)[0]
     y_1 = y_1.reshape(1, nnod)[0]
     node_array = np.array([np.arange(0, nnod, 1, dtype=np.int32), x_1, y_1])
     icon = np.zeros((10, nelm), dtype=np.int32)
     icon[0, :] = np.arange(0, nelm, 1)
     for i in range(nelm):
-        icon[1, i]  =  2 * i + (2 * i) // (2 * nx)  * (2 + 2 * nx)
-    icon[2, :] = icon[1, :] + 1
-    icon[3, :] = icon[2, :] + 1
-    icon[4, :] = icon[3, :] + (2 * nx + 1)
-    icon[5, :] = icon[4, :] + (2 * nx + 1)
-    icon[6, :] = icon[5, :] - 1
-    icon[7, :] = icon[6, :] - 1
-    icon[8, :] = icon[7, :] - (2 * nx + 1)
-    icon[9, :] = icon[8, :] + 1
+        icon[1, i]  =  2 * i + (2 * i) // (2 * ny)  * (2 + 2 * ny)
+    icon[2, :] = icon[1, :] + (2 * ny + 1)
+    icon[3, :] = icon[2, :] + (2 * ny + 1)
+    icon[4, :] = icon[3, :] + 1
+    icon[5, :] = icon[4, :] + 1
+    icon[6, :] = icon[5, :] - (2 * ny + 1)
+    icon[7, :] = icon[6, :] - (2 * ny + 1)
+    icon[8, :] = icon[7, :] - 1
+    icon[9, :] = icon[8, :] + (2 * ny + 1)
     icon = icon.transpose()
     for i in range(nnod):
         ax1.text(node_array[1][i], node_array[2][i], str(node_array[0][i]), fontsize=6)
