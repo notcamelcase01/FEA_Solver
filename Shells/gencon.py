@@ -133,7 +133,7 @@ def get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min, bx_max, bx_
 
     return icon, node_array, (x_1, y_1), node_array1
 
-def get_2D_connectivity_Q9(nx, ny, lx, ly, element_type=3):
+def get_2D_connectivity_Hybrid(nx, ny, lx, ly, element_type=3):
     """
     :param element_type: element type 2 is for Q9 and 1 is for Q4
     :param lx: total width
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     ny = 2
     lx = L
     ly = L
-    connectivityMatrix, nodalArray, (X, Y) = get_2D_connectivity_Q9(nx, ny, lx, ly)
+    connectivityMatrix, nodalArray, (X, Y) = get_2D_connectivity_Hybrid(nx, ny, lx, ly)
     # connectivityMatrix, nodalArray, (X, Y), ii = get_2d_connectivity_hole(nx, ny, lx, ly, Hx, Hy, by_max, by_min,
     #                                                                          bx_max, bx_min)
     print(nodalArray.T)

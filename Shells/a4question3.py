@@ -1,7 +1,7 @@
 import numpy as np
 import solver2d as sol
 import matplotlib.pyplot as plt
-from parameters import alpha, Rx, Ry, h, q0, a, b
+from parameters_q2 import alpha, Rx, Ry, h, q0, a, b
 import keywords as param
 import gencon as gencon
 import sanders as sand
@@ -17,7 +17,7 @@ ly = b
 element_type = param.ElementType.Q9
 OVERRIDE_REDUCED_INTEGRATION = False
 
-connectivityMatrix, nodalArray, (X, Y) = gencon.get_2D_connectivity_Q9(nx, ny, lx, ly, element_type)
+connectivityMatrix, nodalArray, (X, Y) = gencon.get_2D_connectivity_Hybrid(nx, ny, lx, ly, element_type)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 5
 GAUSS_POINTS_REQ = 2
@@ -109,7 +109,7 @@ print("In Curvilinear at mid point (mm)", xxx[0][0] * 1000)
 w0 = np.array(w0) + np.array(winit)
 wt = np.array([w0[i] for i in reqN])[:, None]
 xxx = N.T @ wt
-print("In Cartisian at mid point (mm)", xxx[0][0] * 1000)
+print("Adding curvature at mid point (mm)", xxx[0][0] * 1000)
 oi = max(w0.min(), w0.max(), key=abs)
 w0 = w0 / oi * lx / 10
 w0 = w0.reshape(((element_type - 1) * ny + 1, (element_type - 1) *  nx + 1))

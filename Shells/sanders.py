@@ -1,5 +1,5 @@
 import numpy as np
-from parameters import  G, Eb, mu, k
+from parameters_q2 import  G, Eb, mu, k
 
 def get_lagrange_shape_function(x, y, element_type=2):
     N = np.zeros(element_type ** 2)
