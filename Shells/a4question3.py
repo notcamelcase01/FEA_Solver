@@ -34,7 +34,6 @@ for igp in range(len(weightOfGaussPts)):
     Z2mat = sand.get_z2_matrix(Rx, Ry)
     D1mat += Z1mat.T @ sand.get_C1_matrix() @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
     D2mat += Z2mat.T @ sand.get_C2_matrix() @ Z2mat * 0.5 * H * weightOfGaussPts[igp]
-winit = []
 for elm in range(numberOfElements):
     n = connectivityMatrix[elm][1:]
     xloc = []
