@@ -11,12 +11,11 @@ def assemble_2Dmat(kloc, iv, n, v=None):
     :return: stiffness matrix/ 2dmat to be added to global stiffness/ big 2d mat
     """
     # TODO: Remove if statement (make another function if this ain't resolved)
-    if v is None:
-        v = iv
+    # if v is None:
+    #     v = iv
     K = np.zeros((n, n))
-    for i in range(len(iv)):
-        for j in range(len(v)):
-            K[iv[i]][v[j]] = kloc[i][j]
+    iv = np.array(iv)
+    K[iv[:, None], iv] += kloc
     return K
 
 
@@ -28,8 +27,8 @@ def assemble_force(floc, iv, n):
     :return: force vector to be added to global force vector
     """
     K = np.zeros((n, 1))
-    for i in range(len(iv)):
-        K[iv[i]] = floc[i]
+    iv = np.array(iv)
+    K[iv[:, None], 0] += floc
     return K
 
 

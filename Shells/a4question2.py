@@ -45,10 +45,10 @@ for elm in range(numberOfElements):
     yloc = np.array(yloc)[:, None]
     kloc, floc = sol.init_stiffness_force(nodePerElement, DOF)
     for xgp in range(len(weightOfGaussPts)):
-        xx = 0.5 * (xloc[2*(element_type - 1)] + xloc[0]) + 0.5 * (xloc[2*(element_type - 1)] - xloc[0]) * gaussPts[xgp]
-        q = q0 * np.sin(xx * np.pi / lx)[0]
         for ygp in range(len(weightOfGaussPts)):
             N, Nx, Ny = sand.get_lagrange_shape_function(gaussPts[xgp], gaussPts[ygp], element_type)
+            xx = N.T @ xloc
+            q = q0 * np.sin(xx[0][0] * np.pi / lx)
             J = np.zeros((2, 2))
             J[0, 0] = Nx.T @ xloc
             J[0, 1] = Nx.T @ yloc
