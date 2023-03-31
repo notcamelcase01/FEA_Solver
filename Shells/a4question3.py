@@ -11,8 +11,8 @@ plt.style.use('dark_background')
 
 H = h0
 DIMENSION = 2
-nx = 15
-ny = 15
+nx = 10
+ny = 10
 lx = a
 ly = b
 element_type = param.ElementType.Q9
