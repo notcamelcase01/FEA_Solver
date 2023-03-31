@@ -5,6 +5,7 @@ from parameters_q2 import alpha, Rx, Ry, h, q0, a, b
 import keywords as param
 import gencon as gencon
 import sanders as sand
+import time
 plt.style.use('dark_background')
 
 
@@ -34,6 +35,7 @@ for igp in range(len(weightOfGaussPts)):
     Z2mat = sand.get_z2_matrix(Rx, Ry)
     D1mat += Z1mat.T @ sand.get_C1_matrix() @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
     D2mat += Z2mat.T @ sand.get_C2_matrix() @ Z2mat * 0.5 * H * weightOfGaussPts[igp]
+tik = time.time()
 for elm in range(numberOfElements):
     n = connectivityMatrix[elm][1:]
     xloc = []
@@ -85,6 +87,8 @@ iv = sol.get_assembly_vector(DOF, encastrate)
 for i in iv:
     KG, fg = sol.impose_boundary_condition(KG, fg, i, 0)
 u = sol.get_displacement_vector(KG, fg)
+tok = time.time()
+print(tok - tik)
 w0 = []
 winit = np.sqrt(Rx ** 2 - (nodalArray[1] - lx/2)**2) - Rx * np.cos(alpha)
 for i in range(numberOfNodes):
