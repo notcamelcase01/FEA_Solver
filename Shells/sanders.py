@@ -1,23 +1,23 @@
 import numpy as np
 from parameters_q2 import  G, Eb, mu, k
 
+xi = np.array((-1, 0, 1, 1, 1, 0, -1, -1, 0))
+yi = np.array((-1, -1, -1, 0, 1, 1, 1, 0, 0))
+seq = np.array(((-1, 1, 1, -1), (-1, -1, 1, 1)))
+
+
 def get_lagrange_shape_function(x, y, element_type=2):
     N = np.zeros(element_type ** 2)
     Nx = np.zeros(element_type ** 2)
     Ny = np.zeros(element_type ** 2)
     if element_type == 3:
-        xi = (-1, 0, 1, 1, 1, 0, -1, -1, 0)
-        yi = (-1, -1, -1, 0, 1, 1, 1, 0, 0)
-        for i in range(len(xi)):
-            N[i] = ((1.5 * xi[i]**2 - 1) * x**2 + 0.5 * xi[i] * x + 1 - xi[i]**2) * ((1.5 * yi[i]**2 - 1) * y**2 + 0.5 * yi[i] * y + 1 - yi[i]**2)
-            Nx[i] = ((1.5 * xi[i]**2 - 1) * x * 2 + 0.5 * xi[i]) * ((1.5 * yi[i]**2 - 1) * y**2 + 0.5 * yi[i] * y + 1 - yi[i]**2)
-            Ny[i] = ((1.5 * xi[i]**2 - 1) * x**2 + 0.5 * xi[i] * x + 1 - xi[i]**2) * ((1.5 * yi[i]**2 - 1) * y * 2 + 0.5 * yi[i])
+        N = ((1.5 * xi**2 - 1) * x**2 + 0.5 * xi * x + 1 - xi**2) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)
+        Nx = ((1.5 * xi**2 - 1) * x * 2 + 0.5 * xi) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)
+        Ny = ((1.5 * xi**2 - 1) * x**2 + 0.5 * xi * x + 1 - xi**2) * ((1.5 * yi**2 - 1) * y * 2 + 0.5 * yi)
     elif element_type == 2:
-        seq = ((-1, -1), (1, -1), (1, 1), (-1, 1))
-        for i in range(len(seq)):
-            N[i] = 0.25 * (1 + seq[i][0] * x) * (1 + seq[i][1] * y)
-            Nx[i] = 0.25 * (seq[i][0] * (1 + seq[i][1] * y))
-            Ny[i] = 0.25 * (seq[i][1] * (1 + seq[i][0] * x))
+        N = 0.25 * (1 + seq[0] * x) * (1 + seq[1] * y)
+        Nx = 0.25 * (seq[0] * (1 + seq[1] * y))
+        Ny = 0.25 * (seq[1] * (1 + seq[0] * x))
     else:
         raise Exception("Uhm, This is wendy's, we don't, more than 3 nodes here")
     return N[:, None], Nx[:, None], Ny[:, None]
