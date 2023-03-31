@@ -77,28 +77,19 @@ for elm in range(numberOfElements):
             T2[2:4, 2:4] = Jinv
             B2 = T2 @ sand.get_b2_matrix(N, Nx, Ny)
             kloc += B2.T @ D2mat @ B2 * reduced_wts[xgp] * reduced_wts[ygp] * np.linalg.det(J)
-    iv = sol.get_assembly_vector(DOF, n)
-    fg += sol.assemble_force(floc, iv, numberOfNodes * DOF)
-    KG += sol.assemble_2Dmat(kloc, iv, numberOfNodes * DOF)
+    iv = np.array(sol.get_assembly_vector(DOF, n))
+    fg[iv[:, None], 0] += floc
+    KG[iv[:, None], iv] += kloc
 encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1], lx)))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
 for i in iv:
     KG, fg = sol.impose_boundary_condition(KG, fg, i, 0)
 u = sol.get_displacement_vector(KG, fg)
-u0 = []
-v0 = []
-theta_x = []
-theta_y = []
 w0 = []
-winit = []
+winit = np.sqrt(Rx ** 2 - (nodalArray[1] - lx/2)**2) - Rx * np.cos(alpha)
 for i in range(numberOfNodes):
     x = nodalArray[1][i]
-    u0.append(u[DOF * i][0])
-    v0.append(u[DOF * i + 1][0])
-    theta_x.append(u[DOF * i + 3][0])
-    theta_y.append(u[DOF * i + 4][0])
     w0.append(u[DOF * i + 2][0])
-    winit.append((np.sqrt(Rx ** 2 - (x - lx/2)**2) - Rx * np.cos(alpha)))
 reqN, zeta, eta = sol.get_node_from_cord(connectivityMatrix, (lx/2, ly/2), nodalArray, numberOfElements, nodePerElement, element_type)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
@@ -106,7 +97,7 @@ N, Nx, Ny = sand.get_lagrange_shape_function(zeta, eta, element_type)
 wt = np.array([w0[i] for i in reqN])[:, None]
 xxx = N.T @ wt
 print("In Curvilinear at mid point (mm)", xxx[0][0] * 1000)
-w0 = np.array(w0) + np.array(winit)
+w0 = np.array(w0) + winit
 wt = np.array([w0[i] for i in reqN])[:, None]
 xxx = N.T @ wt
 print("Adding curvature at mid point (mm)", xxx[0][0] * 1000)

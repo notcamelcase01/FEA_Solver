@@ -1,6 +1,6 @@
 import numpy as np
 import keywords as param
-
+from numba import jit
 
 def assemble_2Dmat(kloc, iv, n, v=None):
     """
@@ -82,17 +82,8 @@ def get_displacement_vector(K, f):
     :param f: force vector
     :return: nodal displacement
     """
-    # TODO : Do with without taking inverse
-    try:
-        return np.linalg.inv(K) @ f
-    except np.linalg.LinAlgError as e:
-        if 'Singular matrix' in str(e):
-            print("------------------")
-            i = np.eye(K.shape[0])
-            pin = np.linalg.lstsq(K, i, rcond=None)[0]
-            return pin @ f
-        else:
-            raise
+    return np.linalg.solve(K, f)
+
 
 
 def get_assembly_vector(DOF, n):
