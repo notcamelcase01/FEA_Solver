@@ -1,7 +1,7 @@
 import numpy as np
 import solver2d as sol
 import matplotlib.pyplot as plt
-from parameters_q2 import alpha, Rx, Ry, h, q0, a, b
+from parameters_q2 import alpha, Rx, Ry, h, q0, a, b, Eb, G, k, mu
 import keywords as param
 import gencon as gencon
 import sanders as sand
@@ -33,8 +33,8 @@ D2mat = np.zeros((6, 6))
 for igp in range(len(weightOfGaussPts)):
     Z1mat = sand.get_z1_matrix(0.5 * H * gaussPts[igp], Rx, Ry)
     Z2mat = sand.get_z2_matrix(Rx, Ry)
-    D1mat += Z1mat.T @ sand.get_C1_matrix() @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
-    D2mat += Z2mat.T @ sand.get_C2_matrix() @ Z2mat * 0.5 * H * weightOfGaussPts[igp]
+    D1mat += Z1mat.T @ sand.get_C1_matrix(Eb, mu) @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
+    D2mat += Z2mat.T @ sand.get_C2_matrix(G, k) @ Z2mat * 0.5 * H * weightOfGaussPts[igp]
 tik = time.time()
 for elm in range(numberOfElements):
     n = connectivityMatrix[elm][1:]

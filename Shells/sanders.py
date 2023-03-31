@@ -1,5 +1,4 @@
 import numpy as np
-from parameters_q2 import  G, Eb, mu, k
 
 xi = np.array((-1, 0, 1, 1, 1, 0, -1, -1, 0))
 yi = np.array((-1, -1, -1, 0, 1, 1, 1, 0, 0))
@@ -7,9 +6,6 @@ seq = np.array(((-1, 1, 1, -1), (-1, -1, 1, 1)))
 
 
 def get_lagrange_shape_function(x, y, element_type=2):
-    N = np.zeros(element_type ** 2)
-    Nx = np.zeros(element_type ** 2)
-    Ny = np.zeros(element_type ** 2)
     if element_type == 3:
         N = ((1.5 * xi**2 - 1) * x**2 + 0.5 * xi * x + 1 - xi**2) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)
         Nx = ((1.5 * xi**2 - 1) * x * 2 + 0.5 * xi) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)
@@ -22,12 +18,12 @@ def get_lagrange_shape_function(x, y, element_type=2):
         raise Exception("Uhm, This is wendy's, we don't, more than 3 nodes here")
     return N[:, None], Nx[:, None], Ny[:, None]
 
-def get_C1_matrix():
+def get_C1_matrix(Eb, mu):
     return Eb * np.array([[1, mu, 0],
                           [mu, 1, 0],
                           [0, 0, (1 - mu)/2]])
 
-def get_C2_matrix():
+def get_C2_matrix(G, k):
     return k * np.array([[G, 0],
                      [0, G]])
 

@@ -1,7 +1,7 @@
 import numpy as np
 import solver2d as sol
 import matplotlib.pyplot as plt
-from parameters_q3 import alpha, Rx, Ry, q0, a, b, h1, h0
+from parameters_q3 import alpha, Rx, Ry, q0, a, b, h1, h0, E, G, k, mu
 import keywords as param
 import gencon as gencon
 import sanders as sand
@@ -11,8 +11,8 @@ plt.style.use('dark_background')
 
 H = h0
 DIMENSION = 2
-nx = 10
-ny = 10
+nx = 15
+ny = 15
 lx = a
 ly = b
 element_type = param.ElementType.Q9
@@ -28,11 +28,8 @@ reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INT
                                                         element_type == param.ElementType.Q4) else GAUSS_POINTS_REQ)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
 nodePerElement = element_type ** DIMENSION
-D2mat = np.zeros((6, 6))
 nf, zeta, eta = sol.get_node_from_cord(connectivityMatrix, (lx/2, ly/2), nodalArray, numberOfElements, nodePerElement, element_type)
-for igp in range(len(weightOfGaussPts)):
-    Z2mat = sand.get_z2_matrix(Rx, Ry)
-    D2mat += Z2mat.T @ sand.get_C2_matrix() @ Z2mat * 0.5 * H * weightOfGaussPts[igp]
+
 tik = time.time()
 for elm in range(numberOfElements):
     n = connectivityMatrix[elm][1:]
@@ -51,11 +48,11 @@ for elm in range(numberOfElements):
         for ygp in range(len(weightOfGaussPts)):
             N, Nx, Ny = sand.get_lagrange_shape_function(gaussPts[xgp], gaussPts[ygp], element_type)
             xx = N.T @ xloc
-            H = h1 + (h0 - h1) * (1 -  2 * xx[0][0] / lx) ** 2
+            H = h0 + (h1 - h0) * np.sin(np.pi * xx[0][0] / lx)
             D1mat = np.zeros((9, 9))
             for igp in range(len(weightOfGaussPts)):
                 Z1mat = sand.get_z1_matrix(0.5 * H * gaussPts[igp], Rx, Ry)
-                D1mat += Z1mat.T @ sand.get_C1_matrix() @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
+                D1mat += Z1mat.T @ sand.get_C1_matrix(E, mu) @ Z1mat * 0.5 * H * weightOfGaussPts[igp]
             J = np.zeros((2, 2))
             J[0, 0] = Nx.T @ xloc
             J[0, 1] = Nx.T @ yloc
@@ -74,6 +71,12 @@ for elm in range(numberOfElements):
     for xgp in range(len(reduced_wts)):
         for ygp in range(len(reduced_wts)):
             N, Nx, Ny = sand.get_lagrange_shape_function(reduced_gpts[xgp], reduced_gpts[ygp], element_type)
+            xx = N.T @ xloc
+            H = h0 + (h1 - h0) * np.sin(np.pi * xx[0][0] / lx)
+            D2mat = np.zeros((6, 6))
+            for igp in range(len(weightOfGaussPts)):
+                Z2mat = sand.get_z2_matrix(Rx, Ry)
+                D2mat += Z2mat.T @ sand.get_C2_matrix(G, k) @ Z2mat
             J = np.zeros((2, 2))
             J[0, 0] = Nx.T @ xloc
             J[0, 1] = Nx.T @ yloc
