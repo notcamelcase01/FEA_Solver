@@ -1,11 +1,12 @@
 import numpy as np
 
-xi = np.array((-1, 0, 1, 1, 1, 0, -1, -1, 0))
-yi = np.array((-1, -1, -1, 0, 1, 1, 1, 0, 0))
-seq = np.array(((-1, 1, 1, -1), (-1, -1, 1, 1)))
+
 
 
 def get_lagrange_shape_function(x, y, element_type=2):
+    xi = np.array((-1, 0, 1, 1, 1, 0, -1, -1, 0))
+    yi = np.array((-1, -1, -1, 0, 1, 1, 1, 0, 0))
+    seq = np.array(((-1, 1, 1, -1), (-1, -1, 1, 1)))
     if element_type == 3:
         N = ((1.5 * xi**2 - 1) * x**2 + 0.5 * xi * x + 1 - xi**2) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)
         Nx = ((1.5 * xi**2 - 1) * x * 2 + 0.5 * xi) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)

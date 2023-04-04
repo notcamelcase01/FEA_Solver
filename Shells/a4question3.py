@@ -11,8 +11,8 @@ plt.style.use('dark_background')
 
 H = h0
 DIMENSION = 2
-nx = 10
-ny = 10
+nx = 20
+ny = 20
 lx = a
 ly = b
 element_type = param.ElementType.Q9
@@ -21,7 +21,7 @@ OVERRIDE_REDUCED_INTEGRATION = False
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2D_connectivity_Hybrid(nx, ny, lx, ly, element_type)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 5
-GAUSS_POINTS_REQ = 2
+GAUSS_POINTS_REQ = 3
 numberOfNodes = nodalArray.shape[1]
 weightOfGaussPts, gaussPts = sol.init_gauss_points(GAUSS_POINTS_REQ)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and
@@ -48,7 +48,7 @@ for elm in range(numberOfElements):
         for ygp in range(len(weightOfGaussPts)):
             N, Nx, Ny = sand.get_lagrange_shape_function(gaussPts[xgp], gaussPts[ygp], element_type)
             xx = N.T @ xloc
-            H = h0 + (h1 - h0) * np.sin(np.pi * xx[0][0] / lx)
+            H = h1 + (h0 - h1) * (1 - 2 * xx[0][0] / lx) ** 2
             D1mat = np.zeros((9, 9))
             for igp in range(len(weightOfGaussPts)):
                 Z1mat = sand.get_z1_matrix(0.5 * H * gaussPts[igp], Rx, Ry)
