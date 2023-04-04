@@ -6,7 +6,7 @@ DOF = 1
 L = 1
 numberOfElements = 2
 numberOfNodes = numberOfElements + 1
-wgp, egp = sol.init_gauss_points(3)
+wgp, egp = sol.init_gauss_points(2)
 x = sol.get_node_points_coords(numberOfNodes, L)
 icon = sol.get_connectivity_matrix(numberOfElements, element_type)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
@@ -29,7 +29,7 @@ while True:
             ugp = N.T @ ulo
             dugp = B.T @ ulo
             kloc += B @ B.T * (ugp + np.sqrt(2)) * wgp[igp] * Jacobian
-            tloc += (B @ B.T * (ugp + np.sqrt(2)) + B @ N.T + dugp) * wgp[igp] * Jacobian
+            tloc += kloc + (N @ B.T  * dugp) * wgp[igp] * Jacobian
             floc += N * wgp[igp] * Jacobian
         iv = np.array(iv)
         rloc = -kloc @ ulo  + floc

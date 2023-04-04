@@ -5,6 +5,7 @@ def epsilon_2(x, A, S, l, c):
     return A - S  * np.sqrt(c) / np.sinh(l/(2 * np.sqrt(c)))  * np.cosh((2 * x - l)/(2*np.sqrt(c)))
 
 def epsilon_1(x, A, K, l, c):
+    A = 0
     return A + (K - A) / np.cosh(l/2/np.sqrt(c)) * np.cosh((2 * x - l)/2/np.sqrt(c))
 plt.rc('legend',fontsize='medium') # using a named size
 
@@ -21,7 +22,7 @@ ay.set_xlabel("Non-dimensional Distance")
 ay.set_ylabel("Strain")
 ax.legend(fontsize="23")
 ay.legend(fontsize="23")
-plt.suptitle("A = 2 & S = 1")
+plt.suptitle("A = 2 & K = 1")
 #ax.set_ylim((0, 1.25))
 ay.set_ylim((0, 2.5))
 
