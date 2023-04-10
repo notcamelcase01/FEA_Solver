@@ -17,7 +17,7 @@ def get_2D_connectivity_Q9(nx, ny, lx, ly):
     x = np.linspace(0, width, (2 * nx + 1))
     y = np.linspace(0, height, (2 * ny + 1))
     x_1, y_1 = np.meshgrid(x, y)
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 9))
+    fig, (ax1) = plt.subplots(1, 1, figsize=(16, 9))
     ax1.scatter(x_1, y_1, s=8)
     x_1 = x_1.T
     y_1 = y_1.T
@@ -49,6 +49,7 @@ def get_2D_connectivity_Q9(nx, ny, lx, ly):
     ax1.axis("equal")
     ax1.set_xlabel("Elements in red, nodes in blak")
     ax1.set_title(str(nx) + "x" + str(ny) + " mesh with " + str(nnod) + " nodes")
+    fig2, (ax2) = plt.subplots(1, 1, figsize=(16, 9))
     columns = ("Element", "#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9")
     ax2.table(cellText=icon, colLabels=columns, loc="center")
     ax2.axis('tight')

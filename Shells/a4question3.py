@@ -11,17 +11,17 @@ plt.style.use('dark_background')
 
 H = h0
 DIMENSION = 2
-nx = 20
-ny = 20
+nx = 50
+ny = 50
 lx = a
 ly = b
-element_type = param.ElementType.Q9
+element_type = param.ElementType.Q4
 OVERRIDE_REDUCED_INTEGRATION = False
 
 connectivityMatrix, nodalArray, (X, Y) = gencon.get_2D_connectivity_Hybrid(nx, ny, lx, ly, element_type)
 numberOfElements = connectivityMatrix.shape[0]
 DOF = 5
-GAUSS_POINTS_REQ = 3
+GAUSS_POINTS_REQ = 2
 numberOfNodes = nodalArray.shape[1]
 weightOfGaussPts, gaussPts = sol.init_gauss_points(GAUSS_POINTS_REQ)
 reduced_wts, reduced_gpts = sol.init_gauss_points(1 if (not OVERRIDE_REDUCED_INTEGRATION and

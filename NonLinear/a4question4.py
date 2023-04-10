@@ -12,7 +12,10 @@ icon = sol.get_connectivity_matrix(numberOfElements, element_type)
 KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
 T, r = sol.init_stiffness_force(numberOfNodes, DOF)
 u0 = np.ones(numberOfNodes * DOF)[:, None]
+itr = 0
 while True:
+    KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
+    T, r = sol.init_stiffness_force(numberOfNodes, DOF)
     for elm in range(numberOfElements):
         n = sol.get_node_from_element(icon, elm, element_type)
         xloc = []
@@ -42,7 +45,9 @@ while True:
     T, r = sol.impose_boundary_condition(T, r, 2, 0)
     deltau = np.linalg.solve(T, r)
     uN = u + deltau
-    if np.linalg.norm(np.abs(uN - u0), np.inf)/np.linalg.norm(np.abs(uN), np.inf)  < 10**(-6):
+    if np.linalg.norm(np.abs(uN - u0), np.inf)/np.linalg.norm(np.abs(uN), np.inf)  < 10**(-8):
+        print(itr)
         break
+    itr+=1
     u0 = uN
 print(u0)
