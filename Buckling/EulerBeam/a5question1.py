@@ -51,6 +51,7 @@ KG = sol.impose_boundary_condition(KG, -2, 0)[0]
 G = sol.impose_boundary_condition(G, 0, 0)[0]
 G = sol.impose_boundary_condition(G, -2, 0)[0]
 eigenvalues, eigenvectors = np.linalg.eig(np.linalg.inv(G) @ KG)
+
 idx = eigenvalues.argsort()[::-1]
 eigenvalues = eigenvalues[idx]
 eigenvectors = eigenvectors[:, idx]

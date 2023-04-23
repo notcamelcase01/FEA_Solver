@@ -7,51 +7,6 @@ def get_z_matrix(z):
                   [0, 1, 1, 0, 0, 0, -2*z]])
 
 
-def get_b_matrix(Lx, Ly, Nxx, Nyy, Nxy, N1xx, N1yy, N1xy, N2xx, N2yy, N2xy, N3xx, N3yy, N3xy):
-    """
-    Assuming is linear element for now, and stupid classical plate shenanigans
-    :param N3xy: this is despair
-    :param N3yy: this is despair
-    :param N3xx: this is despair
-    :param N2xy: this is despair
-    :param N2yy: this is despair
-    :param N2xx: this is despair
-    :param N1xy: this is despair
-    :param N1yy: this is despair
-    :param N1xx: this is despair
-    :param Lx: Lx
-    :param Ly: Ly
-    :param Nxx: Nxx
-    :param Nyy: Nyy
-    :param Nxy: Nxy
-    :return: b matrix
-    """
-    # TODO: Make it general for n-noded element
-    return np.array(
-        [[Lx[0][0], Lx[1][0], Lx[2][0], Lx[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [Ly[0][0], Ly[1][0], Ly[2][0], Ly[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, Lx[0][0], Lx[1][0], Lx[2][0], Lx[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, Ly[0][0], Ly[1][0], Ly[2][0], Ly[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, Nxx[0][0], Nxx[1][0], Nxx[2][0], Nxx[3][0], N1xx[0][0], N1xx[1][0], N1xx[2][0], N1xx[3][0], N2xx[0][0], N2xx[1][0], N2xx[2][0], N2xx[3][0], N3xx[0][0], N3xx[1][0], N3xx[2][0], N3xx[3][0]],
-         [0, 0, 0, 0, 0, 0, 0, 0, Nyy[0][0], Nyy[1][0], Nyy[2][0], Nyy[3][0], N1yy[0][0], N1yy[1][0], N1yy[2][0], N1yy[3][0], N2yy[0][0], N2yy[1][0], N2yy[2][0], N2yy[3][0], N3yy[0][0], N3yy[1][0], N3yy[2][0], N3yy[3][0]],
-         [0, 0, 0, 0, 0, 0, 0, 0, Nxy[0][0], Nxy[1][0], Nxy[2][0], Nxy[3][0], N1xy[0][0], N1xy[1][0], N1xy[2][0], N1xy[3][0], N2xy[0][0], N2xy[1][0], N2xy[2][0], N2xy[3][0], N3xy[0][0], N3xy[1][0], N3xy[2][0], N3xy[3][0]]])
-
-
-def get_n_matrix(L, N, N1, N2, N3):
-    """
-    Assuming q4 element
-    :param L: L
-    :param N: N
-    :param N1: N1
-    :param N2: N2
-    :param N3: N3
-    :return: n matrix
-    """
-    # TODO: Make it general for n-noded element
-    return np.array([[L[0][0], L[1][0], L[2][0], L[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, L[0][0], L[1][0], L[2][0], L[3][0], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, N[0][0], N[1][0], N[2][0], N[3][0], N1[0][0], N1[1][0], N1[2][0], N1[3][0], N2[0][0], N2[1][0], N2[2][0], N2[3][0], N3[0][0], N3[1][0], N3[2][0], N3[3][0]]])
-
 def get_elasticity():
     """
     :return: C
@@ -62,41 +17,6 @@ def get_elasticity():
                      [.3 * Eb, Eb, 0],
                      [0, 0, G]])
     return C
-
-
-
-def get_lagrange_shape_function(x_gp, y_gp, jx, jy, element_type=2, seq=((-1, -1), (1, -1), (1, 1), (-1, 1))):
-    """
-    :param Jx: d(x_gp)/dx
-    :param Jy: d(y_gp)/dy
-    :param seq: order in which nodes are picked, currently in "N" shape starting from bottom left
-    :param x_gp: x coord
-    :param y_gp: y coord
-    :param element_type: element type (default linear)
-    :return: lagrange fn for Q4 element
-    """
-    Lmat = np.zeros(len(seq))
-    Lmatx = np.zeros(len(seq))
-    Lmaty = np.zeros(len(seq))
-    for i in range(len(seq)):
-        Lmat[i] = 0.25 * (1 + seq[i][0] * x_gp) * (1 + seq[i][1] * y_gp)
-        Lmatx[i] = 0.25 / jx * (seq[i][0] * (1 + seq[i][1] * y_gp))
-        Lmaty[i] = 0.25 / jy * (seq[i][1] * (1 + seq[i][0] * x_gp))
-    return Lmat[:, None], Lmatx[:, None], Lmaty[:, None]
-
-
-def get_assembly_vector(DOF, n):
-    """
-    :param DOF: dof
-    :param n: nodes
-    :return: assembly points
-    """
-    iv = [0] * 24
-    for i in range(len(n)):
-        situ =  [0 + i, 4 + i, 8 + i, 12 + i, 16 + i, 20 + i]
-        for j in range(len(situ)):
-            iv[situ[j]] = n[i] * DOF + j
-    return iv
 
 
 def get_2d_connectivity(nx, ny, lx, ly):
@@ -127,84 +47,6 @@ def get_2d_connectivity(nx, ny, lx, ly):
     return icon, node_array, np.meshgrid(x, y)
 
 
-def get_BorN_F(x, y, jx, jy, needN = False, justN = False):
-    L, Lx, Ly = get_lagrange_shape_function(x, y, jx, jy)
-    Nx = np.array([0.25 * (2 - 3 * x + x ** 3),
-                   -(jx / 4) * (1 - x - x**2 + x**3),
-                   0.25 * (2 + 3 * x - x**3),
-                   -(jx / 4) * (-1 - x + x**2 + x**3)])[:, None]
-    Ny = np.array([0.25 * (2 - 3 * y + y ** 3),
-                   -(jy / 4) * (1 - y - y ** 2 + y ** 3),
-                   0.25 * (2 + 3 * y - y ** 3),
-                   -(jy / 4) * (-1 - y + y ** 2 + y ** 3)])[:, None]
-    N1 = (Nx[0:2] @ Ny[0:2].T).T.reshape(4,)
-    N2 = (Nx[2:4] @ Ny[0:2].T).T.reshape(4,)
-    N3 = (Nx[2:4] @ Ny[2:4].T).T.reshape(4,)
-    N4 = (Nx[0:2] @ Ny[2:4].T).T.reshape(4,)
-    H = [N1, N2, N3, N4]
-    if justN:
-        return N1[:, None], N2[:, None], N3[:, None], N4[:, None]
-    if needN:
-        B1 = np.zeros((3, 24))
-        for k in range(4):
-            B1[0, 6 * k] = L[k][0]
-            B1[1, 6 * k + 1] = L[k][0]
-            B1[2, 6 * k + 2:6 * k + 6] = H[k]
-        return B1
-
-    dNx = np.array([0.25 * (-3 + 3 * x ** 2),
-                  -(jx / 4) * (-1 - 2 * x + 3 * x ** 2),
-                    0.25 * (3 - 3 * x ** 2),
-                    -(jx / 4) * (-1 + 2 * x + 3 * x ** 2)])[:, None]
-    dNy = np.array([0.25 * (-3 + 3 * y ** 2),
-                  -(jy / 4) * (-1 - 2 * y + 3 * y ** 2),
-                    0.25 * (3 - 3 * y ** 2),
-                    -(jy / 4) * (-1 + 2 * y + 3 * y ** 2)])[:, None]
-    Nx1 = (dNx[0:2] @ Ny[0:2].T).T.reshape(4, 1) * (1 / jx)
-    Nx2 = (dNx[2:4] @ Ny[0:2].T).T.reshape(4, 1) * (1 / jx)
-    Nx3 = (dNx[2:4] @ Ny[2:4].T).T.reshape(4, 1) * (1 / jx)
-    Nx4 = (dNx[0:2] @ Ny[2:4].T).T.reshape(4, 1) * (1 / jx)
-    Ny1 = (Nx[0:2] @ dNy[0:2].T).T.reshape(4, 1) * (1 / jy)
-    Ny2 = (Nx[2:4] @ dNy[0:2].T).T.reshape(4, 1) * (1 / jy)
-    Ny3 = (Nx[2:4] @ dNy[2:4].T).T.reshape(4, 1) * (1 / jy)
-    Ny4 = (Nx[0:2] @ dNy[2:4].T).T.reshape(4, 1) * (1 / jy)
-    dNxx = np.array([0.25 * (6 * x),
-                    -(jx / 4) * (-2 + 6 * x),
-                     0.25 * (-6 * x),
-                    -(jx / 4) * (2 + 6 * x)])[:, None]
-    dNyy = np.array([0.25 * (6 * y),
-                     -(jy / 4) * (-2 + 6 * y),
-                     0.25 * (-6 * y),
-                     -(jy / 4) * (2 + 6 * y)])[:, None]
-
-    Nxx = (dNxx[0:2] @ Ny[0:2].T).T.reshape(4, ) * (1 / jx**2)
-    N1xx = (dNxx[2:4] @ Ny[0:2].T).T.reshape(4, ) * (1 / jx**2)
-    N2xx = (dNxx[2:4] @ Ny[2:4].T).T.reshape(4, ) * (1 / jx**2)
-    N3xx = (dNxx[0:2] @ Ny[2:4].T).T.reshape(4, ) * (1 / jx**2)
-    Nyy = (Nx[0:2] @ dNyy[0:2].T).T.reshape(4, ) * (1 / jy**2)
-    N1yy = (Nx[2:4] @ dNyy[0:2].T).T.reshape(4, ) * (1 / jy**2)
-    N2yy = (Nx[2:4] @ dNyy[2:4].T).T.reshape(4, ) * (1 / jy**2)
-    N3yy = (Nx[0:2] @ dNyy[2:4].T).T.reshape(4, ) * (1 / jy**2)
-    Nxy  = (dNx[0:2] @ dNy[0:2].T).T.reshape(4, ) * (1 / jy / jx)
-    N1xy = (dNx[2:4] @ dNy[0:2].T).T.reshape(4, ) * (1 / jy / jx)
-    N2xy = (dNx[2:4] @ dNy[2:4].T).T.reshape(4, ) * (1 / jy / jx)
-    N3xy = (dNx[0:2] @ dNy[2:4].T).T.reshape(4, ) * (1 / jy / jx)
-    Hxx = [Nxx, N1xx, N2xx, N3xx]
-    Hyy = [Nyy, N1yy, N2yy, N3yy]
-    Hxy = [Nxy, N1xy, N2xy, N3xy]
-
-    B1 = np.zeros((7, 24))
-    for k in range(4):
-        B1[0, 6 * k] = Lx[k][0]
-        B1[1, 6 * k] = Ly[k][0]
-        B1[2, 6 * k + 1] = Lx[k][0]
-        B1[3, 6 * k + 1] = Ly[k][0]
-        B1[4, 6 * k + 2:6 * k + 6] = Hxx[k]
-        B1[5, 6 * k + 2:6 * k + 6] = Hyy[k]
-        B1[6, 6 * k + 2:6 * k + 6] = Hxy[k]
-    return B1
-
-
 def get_node_from_cord(icon, position, nodalArray, nelm, nodePerElement):
     for elm in range(nelm):
         n = icon[elm][1:]
@@ -218,32 +60,128 @@ def get_node_from_cord(icon, position, nodalArray, nelm, nodePerElement):
             zeta = -1 + 2 * (position[0] - xloc[0]) / (xloc[2] - xloc[0])
             if np.isnan(np.sum(xloc)) or np.isnan(np.sum(yloc)):
                 return None, None, None
-            jx = (xloc[1] - xloc[0]) / 2
-            jy = (yloc[2] - yloc[0]) / 2
-            return n, zeta, eta, jx, jy
+            return n, zeta, eta
     return None, None, None
 
 
-def get_hermite_shape_function(x_gp, y_gp, jx, jy, element_type=2, seq=((-1, -1), (1, -1), (1, 1), (-1, 1))):
+def get_hermite_shape_fn_re(x, y, J, justN = False, deriv = False):
+    xi = np.array((-1, 1, 1, -1))
+    yi = np.array((-1, -1, 1, 1))
+    H1x = -0.25 * (x ** 3 * xi - 3 * x * xi -2)
+    H2x = 0.25 * (x ** 3 + xi * x ** 2 - xi - x)
+    H1x_ = -0.75* xi * (x ** 2 - 1)
+    H2x_ = 0.25 * (3 * x ** 2 + 2 * xi * x - 1)
+    H1x__ =  -1.5 * x * xi
+    H2x__ = 0.25 * (6 * x + 2 * xi)
+    H1y = -0.25 * (y ** 3 * yi - 3 * y * yi - 2)
+    H2y = 0.25 * (y ** 3 + yi * y ** 2 - yi - y)
+    H1y_ = -0.75 * yi * (y ** 2 - 1)
+    H2y_ = 0.25 * (3 * y ** 2 + 2 * yi * y - 1)
+    H1y__ = -1.5 * y * yi
+    H2y__ = 0.25 * (6 * y + 2 * yi)
+    H2x, H2y =  H2x * J[0, 0] + H2y * J[0, 1], H1x * J[1, 0] + H2y * J[1, 1]
+    H2x_, H2y_ = H2x_ * J[0, 0] + H2y_ * J[0, 1], H1x_ * J[1, 0] + H2y_ * J[1, 1]
+    H2x__, H2y__ =  H2x__ * J[0, 0] + H2y__ * J[0, 1], H1x__ * J[1, 0] + H2y__ * J[1, 1]
+    N = H1x * H1y
+    Nb = H2x * H1y
+    Nbb = H1x * H2y
+    Nbbb = H2x * H2y
+    if justN:
+        return N[:, None], Nb[:, None], Nbb[:, None], Nbbb[:, None]
+    if deriv:
+        Nx = H1x_ * H1y
+        Nbx = H2x_ * H1y
+        Nbbx = H1x_ * H2y
+        Nbbbx = H2x_ * H2y
+        Ny = H1y_ * H1x
+        Nby = H1y_ * H2x
+        Nbby = H2y_ * H1x
+        Nbbby = H2y_ * H2x
+        return Nx, Nbx, Nbbx, Nbbbx, Ny, Nby, Nbby, Nbbby
+    Nxx =  H1x__ * H1y
+    Nbxx = H2x__ * H1y
+    Nbbxx = H1x__ * H2y
+    Nbbbxx = H2x__ * H2y
+    Nyy = H1x * H1y__
+    Nbyy = H2x * H1y__
+    Nbbyy = H1x * H2y__
+    Nbbbyy = H2x * H2y__
+    Nxy = H1x_ * H1y_
+    Nbxy = H2x_ * H1y_
+    Nbbxy = H1x_ * H2y_
+    Nbbbxy = H2x_ * H2y_
+    return Nxx, Nbxx, Nbbxx, Nbbbxx, Nyy, Nbyy, Nbbyy, Nbbbyy, Nxy, Nbxy, Nbbxy, Nbbbxy
+
+
+def get_lagrange_shape_function_re(x_gp, y_gp):
     """
-    :param Jy: Jy
-    :param Jx: Jx
-    :param seq: order in which nodes are picked, currently in "N" shape starting from bottom left
     :param x_gp: x coord
     :param y_gp: y coord
-    :param element_type: element type (default linear)
     :return: lagrange fn for Q4 element
     """
-    Nmat = np.zeros(len(seq))
-    Nmat_1 = np.zeros(len(seq))
-    Nmat_2 = np.zeros(len(seq))
-    Nmat_3 = np.zeros(len(seq))
-    for i in range(len(seq)):
-        Nmat[i] = 1 / 16 * (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2) * (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2)
-        Nmat_1[i] = -jx / 16  * seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1) * (y_gp + seq[i][1]) ** 2 * (seq[i][1] * y_gp - 2)
-        Nmat_2[i] = -jy / 16  * seq[i][1] * (y_gp + seq[i][1]) ** 2 * (y_gp * seq[i][1] - 1) * (x_gp + seq[i][0]) ** 2 * (seq[i][0] * x_gp - 2)
-        Nmat_3[i] = jx * jy / 16 * seq[i][0] * (x_gp + seq[i][0]) ** 2 * (x_gp * seq[i][0] - 1) * seq[i][1] * (y_gp + seq[i][1]) ** 2 * (y_gp * seq[i][1] - 1)
-    return [Nmat, Nmat_1, Nmat_2, Nmat_3]
+    xi = np.array((-1, 1, 1, -1))
+    yi = np.array((-1, -1, 1, 1))
+    Lmat = 0.25 * (1 + xi * x_gp) * (1 + y_gp * yi)
+    Lmatx = 0.25  * (xi * (1 + yi * y_gp))
+    Lmaty = 0.25 * (yi * (1 + xi * x_gp))
+    return Lmat[:, None], Lmatx[:, None], Lmaty[:, None]
+
+
+def get_cartisian_shape_hermite(xloc, yloc, J, Jinv, Nxx, Nyy, Nxy, Nx, Ny):
+    H = np.array([[J[0, 0] ** 2, J[0, 1] ** 2, 2 * J[0, 0] * J[0, 1]],
+                  [J[1, 0] ** 2, J[1, 1] ** 2, 2 * J[1, 0] * J[1, 1]],
+                  [J[0, 0] * J[1, 0], J[0, 1] * J[1, 1], J[0, 0] * J[1, 1] + J[1, 0] * J[1, 0]]])
+    Hinv = np.linalg.inv(H)
+    Lxy = 0.25 * np.array([1, -1, 1, -1])[:, None]
+    P1 = np.zeros((3, 2))
+    P1[2, 0] = Lxy.T @ xloc
+    P1[2, 1] = Lxy.T @ yloc
+    P = Hinv @ P1 @ Jinv
+    Nxx, Nyy, Nxy = Hinv[0, 0] * Nxx + Hinv[0, 1] * Nyy + Hinv[0, 2] * Nxy - (P[0, 0] * Nx + P[0, 1] * Ny),  Hinv[1, 0] * Nxx + Hinv[1, 1] * Nyy + Hinv[1, 2] * Nxy - (P[1, 0] * Nx + P[1, 1] * Ny),  Hinv[2, 0] * Nxx + Hinv[2, 1] * Nyy + Hinv[2, 2] * Nxy - (P[2, 0] * Nx + P[2, 1] * Ny)
+    return Nxx, Nyy, Nxy
+
+
+def get_cartisian_shape_lagrange(xloc, yloc, Nx, Ny):
+    J = np.zeros((2, 2))
+    J[0, 0] = Nx.T @ xloc
+    J[0, 1] = Nx.T @ yloc
+    J[1, 0] = Ny.T @ xloc
+    J[1, 1] = Ny.T @ yloc
+    Jinv = np.linalg.inv(J)
+    Nx, Ny =  Nx * Jinv[0, 0] + Ny * Jinv[0, 1], Nx * Jinv[1, 0] + Ny * Jinv[1, 1]
+    return Nx, Ny, J, Jinv
+
+
+def get_bmat(x, y, xloc, yloc):
+    L, Lx, Ly = get_lagrange_shape_function_re(x, y)
+    Lx, Ly, J, Jinv = get_cartisian_shape_lagrange(xloc, yloc, Lx, Ly)
+    Nxx, N1xx, N2xx, N3xx, Nyy, N1yy, N2yy, N3yy, Nxy, N1xy, N2xy, N3xy = get_hermite_shape_fn_re(x, y, J)
+    Nx, N1x, N2x, N3x, Ny, N1y, N2y, N3y = get_hermite_shape_fn_re(x, y, J, deriv=True)
+    Nxx, Nyy, Nxy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, Nxx, Nyy, Nxy, Nx, Ny)
+    N1xx, N1yy, N1xy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, N1xx, N1yy, N1xy, N1x, N1y)
+    N2xx, N2yy, N2xy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, N2xx, N2yy, N2xy, N2x, N2y)
+    N3xx, N3yy, N3xy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, N3xx, N3yy, N3xy, N3x, N3y)
+    B1 = np.zeros((7, 24))
+    for k in range(4):
+        B1[0, 6 * k] = Lx[k][0]
+        B1[1, 6 * k] = Ly[k][0]
+        B1[2, 6 * k + 1] = Lx[k][0]
+        B1[3, 6 * k + 1] = Ly[k][0]
+        B1[4, 6 * k + 2:6 * k + 6] = [Nxx[k], N1xx[k], N2xx[k], N3xx[k]]
+        B1[5, 6 * k + 2:6 * k + 6] = [Nyy[k], N1yy[k], N2yy[k], N3yy[k]]
+        B1[6, 6 * k + 2:6 * k + 6] = [Nxy[k], N1xy[k], N2xy[k], N3xy[k]]
+    return B1, J
+
+def get_nmat(x, y, J):
+    L, Lx, Ly = get_lagrange_shape_function_re(x, y)
+    N, N1, N2, N3 = get_hermite_shape_fn_re(x, y, J, justN = True)
+    H = [N, N1, N2, N3]
+    B1 = np.zeros((3, 24))
+    for k in range(4):
+        B1[0, 6 * k] = L[k][0]
+        B1[1, 6 * k + 1] = L[k][0]
+        B1[2, 6 * k + 2:6 * k + 6] = [N[k], N1[k], N2[k], N3[k]]
+    return B1
 
 
 if __name__ == "__main__":
