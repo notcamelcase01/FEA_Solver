@@ -68,28 +68,34 @@ for i in range(numberOfNodes):
 reqN, zeta, eta = kirk.get_node_from_cord(connectivityMatrix, (0.5, 0.5), nodalArray, numberOfElements, nodePerElement)
 if reqN is None:
     raise Exception("Chose a position inside plate plis")
-# Nmat, Nmat1, Nmat2, Nmat3 = kirk.get_hermite_shape_fn_re(eta, zeta, justN = True)
-# wt = np.array([u[DOF * i + 2][0] for i in reqN])[:, None]
-# wxt = np.array([u[DOF * i + 3][0] for i in reqN])[:, None]
-# wyt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
-# wxyt = np.array([u[DOF * i + 5][0] for i in reqN])[:, None]
-#
-# xxx = Nmat.T @ wt + Nmat1.T @ wxt + Nmat2.T @ wyt + Nmat3.T @ wxyt
-xxx = max(w0, key=abs)
-w0 = - np.array(w0)
+xloc = []
+yloc = []
+for i in range(element_type**DIMENSION):
+    xloc.append(nodalArray[1][reqN[i]])
+    yloc.append(nodalArray[2][reqN[i]])
+xloc = np.array(xloc)[:, None]
+yloc = np.array(yloc)[:, None]
+L, Lx, Ly = kirk.get_lagrange_shape_function_re(zeta, eta)
+Lx, Ly, J, Jinv = kirk.get_cartisian_shape_lagrange(xloc, yloc, Lx, Ly)
+Nmat, Nmat1, Nmat2, Nmat3 = kirk.get_hermite_shape_fn_re(eta, zeta, J, justN = True)
+wt = np.array([u[DOF * i + 2][0] for i in reqN])[:, None]
+wxt = np.array([u[DOF * i + 3][0] for i in reqN])[:, None]
+wyt = np.array([u[DOF * i + 4][0] for i in reqN])[:, None]
+wxyt = np.array([u[DOF * i + 5][0] for i in reqN])[:, None]
+
+xxx = Nmat.T @ wt + Nmat1.T @ wxt + Nmat2.T @ wyt + Nmat3.T @ wxyt
+print("Displacement a required coordinate : ", xxx)
+w0 = np.array(w0)
 w0 = w0.reshape((ny + 1, nx + 1))
 fig = plt.figure(figsize=(6, 6))
 ax = plt.axes(projection='3d')
-#w0 = - np.array(w0) * 1 / np.min(w0) # Scaled w to make it look better
-print(w0)
 
 ax.plot_wireframe(X0, Y0, w0)
 ax.set_title("w0 is scaled to make graph look prettier")
 ax.set_axis_off()
 fig2, ax = plt.subplots(1, 1, figsize=(6, 6))
-
 ax.contourf(X0, Y0, w0, 70, cmap='jet')
-ax.set_title('Contour Plot, w_A = {x}'.format(x = xxx))
+ax.set_title('Contour Plot')
 ax.set_xlabel('_x')
 ax.set_ylabel('_y')
 ax.set_aspect('equal')
