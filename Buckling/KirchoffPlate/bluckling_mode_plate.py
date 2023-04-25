@@ -9,7 +9,7 @@ nxnydof = np.load('data_plate/nxnydof.npy', allow_pickle=True)
 nx = nxnydof[0]
 ny = nxnydof[1]
 DOF  = nxnydof[2]
-query_mode = 2
+query_mode = 1
 X0 = np.load('data_plate/X0.npy', allow_pickle=True)
 Y0 = np.load('data_plate/Y0.npy', allow_pickle=True)
 eigenvectors = np.load('data_plate/eigvec.npy', allow_pickle=True)
