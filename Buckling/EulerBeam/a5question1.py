@@ -49,7 +49,7 @@ for elm in range(numberOfElements):
 
 
 KG = sol.impose_boundary_condition(KG, 0, 0)
-KG = sol.impose_boundary_condition(KG,-2, 0)
+KG = sol.impose_boundary_condition(KG, -2, 0)
 G = sol.impose_boundary_condition(G, 0, 0)
 G = sol.impose_boundary_condition(G, -2, 0)
 eigenvalues, eigenvectors = sc.linalg.eig(KG, G)
@@ -58,7 +58,7 @@ idx = eigenvalues[:-2].argsort()
 print(idx, idx.shape)
 eigenvalues[:-2] = eigenvalues[idx]
 eigenvectors[:, :-2] = eigenvectors[:, idx]
-print(eigenvalues[0])
+print(eigenvalues)
 fig, ax = plt.subplots(1, 1, figsize=(10, 5))
 ax.plot(x, eigenvectors[np.arange(0, len(eigenvalues), DOF), 0])
 ax.set_title("Mode 1 buckling , at critical load of : {x}".format(x = eigenvalues[0]))
