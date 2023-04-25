@@ -40,7 +40,7 @@ for elm in range(numberOfElements):
     gloc = np.zeros_like(kloc)
     for igp in range(len(weightOfGaussPts)):
         N, Nx, Nxx = sol.get_hermite_fn(gaussPts[igp], Jacobian)
-        Moi = get_height() ** 3 / 12
+        Moi = b * get_height() ** 3 / 12
         kloc += E * Moi * np.outer(Nxx, Nxx) * Jacobian * weightOfGaussPts[igp]
         gloc += np.outer(Nx, Nx) * Jacobian * weightOfGaussPts[igp]
     iv = np.array(sol.get_assembly_vector(DOF, n))
@@ -49,9 +49,9 @@ for elm in range(numberOfElements):
 
 
 KG = sol.impose_boundary_condition(KG, 0, 0)
-KG = sol.impose_boundary_condition(KG, 1, 0)
+KG = sol.impose_boundary_condition(KG,-2, 0)
 G = sol.impose_boundary_condition(G, 0, 0)
-G = sol.impose_boundary_condition(G, 1, 0)
+G = sol.impose_boundary_condition(G, -2, 0)
 eigenvalues, eigenvectors = sc.linalg.eig(KG, G)
 eigenvalues = eigenvalues.real
 idx = eigenvalues[:-2].argsort()
@@ -61,4 +61,5 @@ eigenvectors[:, :-2] = eigenvectors[:, idx]
 print(eigenvalues[0])
 fig, ax = plt.subplots(1, 1, figsize=(10, 5))
 ax.plot(x, eigenvectors[np.arange(0, len(eigenvalues), DOF), 0])
+ax.set_title("Mode 1 buckling , at critical load of : {x}".format(x = eigenvalues[0]))
 plt.show()

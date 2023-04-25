@@ -1,4 +1,5 @@
 import numpy as np
+import scipy as sc
 
 
 def assemble_2Dmat(kloc, iv, n, v=None):
@@ -89,9 +90,9 @@ def get_displacement_vector(K, f):
     """
     # TODO : Do with without taking inverse
     try:
-        return np.linalg.inv(K) @ f
+        return sc.linalg.solve(K, f)
     except np.linalg.LinAlgError as e:
-        if 'Singular matrix' in str(e):
+        if 'singular' or 'Singular' in str(e):
             print("------------------")
             i = np.eye(K.shape[0])
             pin = np.linalg.lstsq(K, i, rcond=None)[0]
@@ -100,15 +101,21 @@ def get_displacement_vector(K, f):
             raise
 
 
-def get_assembly_vector(DOF, n):
+def get_assembly_vector(DOF, n, required_dof = None):
     """
+    :param required_dof: required DOF
     :param DOF: dof
     :param n: nodes
     :return: assembly points
     """
     iv = []
+    if required_dof is None:
+        for i in n:
+            for j in range(DOF):
+                iv.append(DOF * i + j)
+        return iv
     for i in n:
-        for j in range(DOF):
+        for j in required_dof:
             iv.append(DOF * i + j)
     return iv
 

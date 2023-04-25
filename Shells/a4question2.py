@@ -11,8 +11,8 @@ plt.style.use('dark_background')
 
 H = h
 DIMENSION = 2
-nx = 10
-ny = 10
+nx = 20
+ny = 20
 lx = a
 ly = b
 element_type = param.ElementType.Q9
@@ -82,6 +82,8 @@ for elm in range(numberOfElements):
     iv = np.array(sol.get_assembly_vector(DOF, n))
     fg[iv[:, None], 0] += floc
     KG[iv[:, None], iv] += kloc
+tok = time.time()
+print(tok - tik)
 encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1], lx)))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
 for i in iv:

@@ -5,13 +5,13 @@ from parameters import L
 import keywords as param
 import kirchoffplate as kirk
 from mpl_toolkits.mplot3d import Axes3D
-
+import time
 plt.style.use('dark_background')
 
 H = L/100
 DIMENSION = 2
-nx = 14
-ny = 14
+nx = 20
+ny = 20
 lx = L
 ly = L
 connectivityMatrix, nodalArray, (X0, Y0)  = kirk.get_2d_connectivity(nx, ny, L, L)
@@ -28,6 +28,7 @@ Dmat = np.zeros((7, 7))
 for igp in range(len(weightOfGaussPts)):
     Zmat = kirk.get_z_matrix(gaussPts[igp] * H / 2)
     Dmat += Zmat.T @ kirk.get_elasticity() @ Zmat * H/2 * weightOfGaussPts[igp]
+tik = time.time()
 for elm in range(numberOfElements):
     n = connectivityMatrix[elm][1:]
     xloc = []
@@ -47,7 +48,8 @@ for elm in range(numberOfElements):
     iv = np.array(sol.get_assembly_vector(DOF, n))
     fg[iv[:, None], 0] += floc
     KG[iv[:, None], iv] += kloc
-
+tok = time.time()
+print(tik - tok)
 encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1], lx)) | (np.isclose(nodalArray[2], 0)) | (np.isclose(nodalArray[2], ly)))[0]
 iv = sol.get_assembly_vector(DOF, encastrate)
 print(np.sum(fg))
@@ -55,7 +57,8 @@ for ibc in iv:
     KG, fg = sol.impose_boundary_condition(KG, ibc, 0, fg)
 
 u = sol.get_displacement_vector(KG, fg)
-
+tok = time.time()
+print(tik - tok)
 u0 = []
 v0 = []
 theta_x = []
