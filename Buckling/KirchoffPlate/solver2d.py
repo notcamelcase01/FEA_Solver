@@ -1,5 +1,4 @@
 import numpy as np
-import keywords as param
 
 
 def assemble_2Dmat(kloc, iv, n, v=None):
@@ -61,7 +60,7 @@ def init_stiffness_force(nnod, DOF):
     return np.zeros((nnod * DOF, nnod * DOF)), np.zeros((nnod * DOF, 1))
 
 
-def impose_boundary_condition(K, f, ibc, bc):
+def impose_boundary_condition(K, ibc, bc, f=None):
     """
     :param K: Stiffness matrix
     :param f: force vector
@@ -69,12 +68,17 @@ def impose_boundary_condition(K, f, ibc, bc):
     :param bc: boundary condition
     :return: stiffness matrix and force vector after imposed bc
     """
-    f = f - (K[:, ibc] * bc)[:, None]
-    f[ibc] = bc
+    if f is not None:
+        f = f - (K[:, ibc] * bc)[:, None]
+        f[ibc] = bc
+        K[:, ibc] = 0
+        K[ibc, :] = 0
+        K[ibc, ibc] = 1
+        return K, f
     K[:, ibc] = 0
     K[ibc, :] = 0
     K[ibc, ibc] = 1
-    return K, f
+    return K
 
 
 def get_displacement_vector(K, f):

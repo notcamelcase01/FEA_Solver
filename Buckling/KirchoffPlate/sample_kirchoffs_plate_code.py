@@ -52,7 +52,7 @@ encastrate = np.where((np.isclose(nodalArray[1], 0)) | (np.isclose(nodalArray[1]
 iv = sol.get_assembly_vector(DOF, encastrate)
 print(np.sum(fg))
 for ibc in iv:
-    KG, fg = sol.impose_boundary_condition(KG, fg, ibc, 0)
+    KG, fg = sol.impose_boundary_condition(KG, ibc, 0, fg)
 
 u = sol.get_displacement_vector(KG, fg)
 

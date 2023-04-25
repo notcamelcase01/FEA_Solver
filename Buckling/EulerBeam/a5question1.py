@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sc
 import solver1d as sol
 import matplotlib.pyplot as plt
-from parameters import E, b, f0, L, F, Eb
+from parameters import E, L
 import keywords as param
 
 plt.style.use('dark_background')
@@ -21,6 +21,7 @@ Define 1D FEA Model
 numberOfElements = 20
 DOF = 2
 element_type = 2
+b = get_height()
 
 numberOfNodes = numberOfElements + 1
 x = sol.get_node_points_coords(numberOfNodes, L)
@@ -48,17 +49,16 @@ for elm in range(numberOfElements):
 
 
 KG = sol.impose_boundary_condition(KG, 0, 0)
-KG = sol.impose_boundary_condition(KG, -2, 0)
+KG = sol.impose_boundary_condition(KG, 1, 0)
 G = sol.impose_boundary_condition(G, 0, 0)
-G = sol.impose_boundary_condition(G, -2, 0)
+G = sol.impose_boundary_condition(G, 1, 0)
 eigenvalues, eigenvectors = sc.linalg.eig(KG, G)
 eigenvalues = eigenvalues.real
 idx = eigenvalues[:-2].argsort()
 print(idx, idx.shape)
 eigenvalues[:-2] = eigenvalues[idx]
 eigenvectors[:, :-2] = eigenvectors[:, idx]
-print(eigenvalues)
-print(eigenvectors)
+print(eigenvalues[0])
 fig, ax = plt.subplots(1, 1, figsize=(10, 5))
 ax.plot(x, eigenvectors[np.arange(0, len(eigenvalues), DOF), 0])
 plt.show()

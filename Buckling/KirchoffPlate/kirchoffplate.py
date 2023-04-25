@@ -183,6 +183,31 @@ def get_nmat(x, y, J):
     return B1
 
 
+def get_hermite_shapes(x, y, xloc, yloc):
+    L, Lx, Ly = get_lagrange_shape_function_re(x, y)
+    Lx, Ly, J, Jinv = get_cartisian_shape_lagrange(xloc, yloc, Lx, Ly)
+    N, N1, N2, N3 = get_hermite_shape_fn_re(x, y, J, justN = True)
+    Nxx, N1xx, N2xx, N3xx, Nyy, N1yy, N2yy, N3yy, Nxy, N1xy, N2xy, N3xy = get_hermite_shape_fn_re(x, y, J)
+    Nx, N1x, N2x, N3x, Ny, N1y, N2y, N3y = get_hermite_shape_fn_re(x, y, J, deriv=True)
+    Nxx, Nyy, Nxy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, Nxx, Nyy, Nxy, Nx, Ny)
+    N1xx, N1yy, N1xy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, N1xx, N1yy, N1xy, N1x, N1y)
+    N2xx, N2yy, N2xy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, N2xx, N2yy, N2xy, N2x, N2y)
+    N3xx, N3yy, N3xy = get_cartisian_shape_hermite(xloc, yloc, J, Jinv, N3xx, N3yy, N3xy, N3x, N3y)
+    Nx, Ny =  Nx * Jinv[0, 0] + Ny * Jinv[0, 1], Nx * Jinv[1, 0] + Ny * Jinv[1, 1]
+    N1x, N1y =  N1x * Jinv[0, 0] + N1y * Jinv[0, 1], N1x * Jinv[1, 0] + N1y * Jinv[1, 1]
+    N2x, N2y =  N2x * Jinv[0, 0] + N2y * Jinv[0, 1], N2x * Jinv[1, 0] + N2y * Jinv[1, 1]
+    N3x, N3y =  N3x * Jinv[0, 0] + N3y * Jinv[0, 1], N3x * Jinv[1, 0] + N3y * Jinv[1, 1]
+    H = np.zeros((6, 16))
+    for k in range(4):
+        H[0, 4 * k: 4 * k + 4] = [N[k], N1[k], N2[k], N3[k]]
+        H[1, 4 * k: 4 * k + 4] = [Nx[k], N1x[k], N2x[k], N3x[k]]
+        H[2, 4 * k: 4 * k + 4] = [Ny[k], N1y[k], N2y[k], N3y[k]]
+        H[3, 4 * k: 4 * k + 4] = [Nxx[k], N1xx[k], N2xx[k], N3xx[k]]
+        H[4, 4 * k: 4 * k + 4] = [Nyy[k], N1yy[k], N2yy[k], N3yy[k]]
+        H[5, 4 * k: 4 * k + 4] = [Nxy[k], N1xy[k], N2xy[k], N3xy[k]]
+    return H, J
+
+
 if __name__ == "__main__":
     c, n, (i,j) = get_2d_connectivity(10, 10, 1, 1)
     print(c)
