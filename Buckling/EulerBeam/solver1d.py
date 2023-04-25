@@ -2,37 +2,6 @@ import numpy as np
 import keywords as param
 
 
-def assemble_stiffness(kloc, iv, n, v=None):
-    """
-    :param v: nodes where stiffness are to be places
-    :param kloc: local stiffness matrix
-    :param iv: nodes where stiffness are to be placed
-    :param n: DOF*number of nodes
-    :return: stiffness matrix to be added to global stiffness
-    """
-    # TODO: Remove if statement (make another function if this ain't resolved)
-    if v is None:
-        v = iv
-    K = np.zeros((n, n))
-    for i in range(len(iv)):
-        for j in range(len(v)):
-            K[iv[i]][v[j]] = kloc[i][j]
-    return K
-
-
-def assemble_force(floc, iv, n):
-    """
-    :param floc: local force vector
-    :param iv: nodes where forces are to be placed
-    :param n: DOF*number of nodes
-    :return: force vector to be added to global force vector
-    """
-    K = np.zeros((n, 1))
-    for i in range(len(iv)):
-        K[iv[i]] = floc[i]
-    return K
-
-
 def get_node_points_coords(n, length, reqn=(0, 1)):
     """
     :param reqn: Requested lengths you want Nodes
@@ -168,10 +137,14 @@ def impose_boundary_condition(K, ibc, bc, f=None):
     if f is not None:
         f = f - (K[:, ibc] * bc)[:, None]
         f[ibc] = bc
+        K[:, ibc] = 0
+        K[ibc, :] = 0
+        K[ibc, ibc] = 1
+        return K, f
     K[:, ibc] = 0
     K[ibc, :] = 0
     K[ibc, ibc] = 1
-    return K, f
+    return K
 
 
 def get_displacement_vector(K, f):

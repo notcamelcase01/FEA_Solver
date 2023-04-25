@@ -1,4 +1,5 @@
 import numpy as np
+import scipy as sc
 import solver1d as sol
 import matplotlib.pyplot as plt
 from parameters import E, b, f0, L, F, Eb
@@ -39,23 +40,25 @@ for elm in range(numberOfElements):
     for igp in range(len(weightOfGaussPts)):
         N, Nx, Nxx = sol.get_hermite_fn(gaussPts[igp], Jacobian)
         Moi = get_height() ** 3 / 12
-        kloc += Eb * Moi * np.outer(Nxx, Nxx) * Jacobian * weightOfGaussPts[igp]
+        kloc += E * Moi * np.outer(Nxx, Nxx) * Jacobian * weightOfGaussPts[igp]
         gloc += np.outer(Nx, Nx) * Jacobian * weightOfGaussPts[igp]
     iv = np.array(sol.get_assembly_vector(DOF, n))
     KG[iv[:, None], iv] += kloc
     G[iv[:, None], iv] += gloc
 
 
-KG = sol.impose_boundary_condition(KG, 0, 0)[0]
-KG = sol.impose_boundary_condition(KG, -2, 0)[0]
-G = sol.impose_boundary_condition(G, 0, 0)[0]
-G = sol.impose_boundary_condition(G, -2, 0)[0]
-eigenvalues, eigenvectors = np.linalg.eig(np.linalg.inv(G) @ KG)
-
-idx = eigenvalues.argsort()[::-1]
-eigenvalues = eigenvalues[idx]
-eigenvectors = eigenvectors[:, idx]
-eigenvalues = np.flip(eigenvalues)[0:]
-eigenvectors = np.flip(eigenvectors).T[0:]
+KG = sol.impose_boundary_condition(KG, 0, 0)
+KG = sol.impose_boundary_condition(KG, -2, 0)
+G = sol.impose_boundary_condition(G, 0, 0)
+G = sol.impose_boundary_condition(G, -2, 0)
+eigenvalues, eigenvectors = sc.linalg.eig(KG, G)
+eigenvalues = eigenvalues.real
+idx = eigenvalues[:-2].argsort()
+print(idx, idx.shape)
+eigenvalues[:-2] = eigenvalues[idx]
+eigenvectors[:, :-2] = eigenvectors[:, idx]
 print(eigenvalues)
-
+print(eigenvectors)
+fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+ax.plot(x, eigenvectors[np.arange(0, len(eigenvalues), DOF), 0])
+plt.show()

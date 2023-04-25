@@ -67,7 +67,7 @@ def get_node_from_cord(icon, position, nodalArray, nelm, nodePerElement):
 def get_hermite_shape_fn_re(x, y, J, justN = False, deriv = False):
     xi = np.array((-1, 1, 1, -1))
     yi = np.array((-1, -1, 1, 1))
-    H1x = -0.25 * (x ** 3 * xi - 3 * x * xi -2)
+    H1x = -0.25 * (x ** 3 * xi - 3 * x * xi - 2)
     H2x = 0.25 * (x ** 3 + xi * x ** 2 - xi - x)
     H1x_ = -0.75* xi * (x ** 2 - 1)
     H2x_ = 0.25 * (3 * x ** 2 + 2 * xi * x - 1)
@@ -175,7 +175,6 @@ def get_bmat(x, y, xloc, yloc):
 def get_nmat(x, y, J):
     L, Lx, Ly = get_lagrange_shape_function_re(x, y)
     N, N1, N2, N3 = get_hermite_shape_fn_re(x, y, J, justN = True)
-    H = [N, N1, N2, N3]
     B1 = np.zeros((3, 24))
     for k in range(4):
         B1[0, 6 * k] = L[k][0]
