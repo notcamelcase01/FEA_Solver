@@ -246,6 +246,76 @@ def get_hermite_shapes(x, y, xloc, yloc):
     return H, J
 
 
+def get_BorN_F(x, y, jx, jy, needN = False, justN = False):
+    Nx = np.array([0.25 * (2 - 3 * x + x ** 3),
+                   -(jx / 4) * (1 - x - x**2 + x**3),
+                   0.25 * (2 + 3 * x - x**3),
+                   -(jx / 4) * (-1 - x + x**2 + x**3)])[:, None]
+    Ny = np.array([0.25 * (2 - 3 * y + y ** 3),
+                   -(jy / 4) * (1 - y - y ** 2 + y ** 3),
+                   0.25 * (2 + 3 * y - y ** 3),
+                   -(jy / 4) * (-1 - y + y ** 2 + y ** 3)])[:, None]
+    N1 = (Nx[0:2] @ Ny[0:2].T).T.reshape(4,)
+    N2 = (Nx[2:4] @ Ny[0:2].T).T.reshape(4,)
+    N3 = (Nx[2:4] @ Ny[2:4].T).T.reshape(4,)
+    N4 = (Nx[0:2] @ Ny[2:4].T).T.reshape(4,)
+
+
+    dNx = np.array([0.25 * (-3 + 3 * x ** 2),
+                  -(jx / 4) * (-1 - 2 * x + 3 * x ** 2),
+                    0.25 * (3 - 3 * x ** 2),
+                    -(jx / 4) * (-1 + 2 * x + 3 * x ** 2)])[:, None]
+    dNy = np.array([0.25 * (-3 + 3 * y ** 2),
+                  -(jy / 4) * (-1 - 2 * y + 3 * y ** 2),
+                    0.25 * (3 - 3 * y ** 2),
+                    -(jy / 4) * (-1 + 2 * y + 3 * y ** 2)])[:, None]
+    Nx1 = (dNx[0:2] @ Ny[0:2].T).T.reshape(4,) * (1 / jx)
+    Nx2 = (dNx[2:4] @ Ny[0:2].T).T.reshape(4,) * (1 / jx)
+    Nx3 = (dNx[2:4] @ Ny[2:4].T).T.reshape(4,) * (1 / jx)
+    Nx4 = (dNx[0:2] @ Ny[2:4].T).T.reshape(4,) * (1 / jx)
+    Ny1 = (Nx[0:2] @ dNy[0:2].T).T.reshape(4,) * (1 / jy)
+    Ny2 = (Nx[2:4] @ dNy[0:2].T).T.reshape(4,) * (1 / jy)
+    Ny3 = (Nx[2:4] @ dNy[2:4].T).T.reshape(4,) * (1 / jy)
+    Ny4 = (Nx[0:2] @ dNy[2:4].T).T.reshape(4,) * (1 / jy)
+    Hx = [Nx1, Nx2, Nx3, Nx4]
+    Hy = [Ny1, Ny2, Ny3, Ny4]
+    dNxx = np.array([0.25 * (6 * x),
+                    -(jx / 4) * (-2 + 6 * x),
+                     0.25 * (-6 * x),
+                    -(jx / 4) * (2 + 6 * x)])[:, None]
+    dNyy = np.array([0.25 * (6 * y),
+                     -(jy / 4) * (-2 + 6 * y),
+                     0.25 * (-6 * y),
+                     -(jy / 4) * (2 + 6 * y)])[:, None]
+
+    Nxx = (dNxx[0:2] @ Ny[0:2].T).T.reshape(4, ) * (1 / jx**2)
+    N1xx = (dNxx[2:4] @ Ny[0:2].T).T.reshape(4, ) * (1 / jx**2)
+    N2xx = (dNxx[2:4] @ Ny[2:4].T).T.reshape(4, ) * (1 / jx**2)
+    N3xx = (dNxx[0:2] @ Ny[2:4].T).T.reshape(4, ) * (1 / jx**2)
+    Nyy = (Nx[0:2] @ dNyy[0:2].T).T.reshape(4, ) * (1 / jy**2)
+    N1yy = (Nx[2:4] @ dNyy[0:2].T).T.reshape(4, ) * (1 / jy**2)
+    N2yy = (Nx[2:4] @ dNyy[2:4].T).T.reshape(4, ) * (1 / jy**2)
+    N3yy = (Nx[0:2] @ dNyy[2:4].T).T.reshape(4, ) * (1 / jy**2)
+    Nxy  = (dNx[0:2] @ dNy[0:2].T).T.reshape(4, ) * (1 / jy / jx)
+    N1xy = (dNx[2:4] @ dNy[0:2].T).T.reshape(4, ) * (1 / jy / jx)
+    N2xy = (dNx[2:4] @ dNy[2:4].T).T.reshape(4, ) * (1 / jy / jx)
+    N3xy = (dNx[0:2] @ dNy[2:4].T).T.reshape(4, ) * (1 / jy / jx)
+    Hxx = [Nxx, N1xx, N2xx, N3xx]
+    Hyy = [Nyy, N1yy, N2yy, N3yy]
+    Hxy = [Nxy, N1xy, N2xy, N3xy]
+
+    H = np.zeros((6, 16))
+    for k in range(4):
+        H[0, 4 * k: 4 * k + 4] = Hx[k]
+        H[1, 4 * k: 4 * k + 4] = Hx[k]
+        H[2, 4 * k: 4 * k + 4] = Hy[k]
+        H[3, 4 * k: 4 * k + 4] = Hxx[k]
+        H[4, 4 * k: 4 * k + 4] = Hyy[k]
+        H[5, 4 * k: 4 * k + 4] = Hxy[k]
+    return H, jx * jy
+
+
+
 if __name__ == "__main__":
     c, n, (i,j) = get_2d_connectivity(10, 10, 1, 1)
     print(c)

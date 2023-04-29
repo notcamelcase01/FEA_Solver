@@ -12,8 +12,8 @@ plt.style.use('dark_background')
 H = 1/1000
 L = H * 100
 DIMENSION = 2
-nx = 20
-ny = 20
+nx = 10
+ny = 10
 lx = L
 ly = L
 
