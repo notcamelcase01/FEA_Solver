@@ -117,9 +117,9 @@ def get_hermite_shape_fn_re(x, y, J, justN = False, deriv = False):
     H2y_ = 0.25 * (3 * y ** 2 + 2 * yi * y - 1)
     H1y__ = -1.5 * y * yi
     H2y__ = 0.25 * (6 * y + 2 * yi)
-    H2x, H2y =  H2x * J[0, 0] + H2y * J[0, 1], H1x * J[1, 0] + H2y * J[1, 1]
-    H2x_, H2y_ = H2x_ * J[0, 0] + H2y_ * J[0, 1], H1x_ * J[1, 0] + H2y_ * J[1, 1]
-    H2x__, H2y__ =  H2x__ * J[0, 0] + H2y__ * J[0, 1], H1x__ * J[1, 0] + H2y__ * J[1, 1]
+    H2x, H2y =  H2x * J[0, 0] + H2y * J[0, 1], H2x * J[1, 0] + H2y * J[1, 1]
+    H2x_, H2y_ = H2x_ * J[0, 0] + H2y_ * J[0, 1], H2x_ * J[1, 0] + H2y_ * J[1, 1]
+    H2x__, H2y__ =  H2x__ * J[0, 0] + H2y__ * J[0, 1], H2x__ * J[1, 0] + H2y__ * J[1, 1]
     N = H1x * H1y
     Nb = H2x * H1y
     Nbb = H1x * H2y
