@@ -51,7 +51,7 @@ for elm in range(numberOfElements):
     for x_igp in range(len(weightOfGaussPts)):
         for y_igp in range(len(weightOfGaussPts)):
             Hmat, J = kirk.get_hermite_shapes(gaussPts[x_igp], gaussPts[y_igp], xloc, yloc)
-            kloc += (-2 * G * (Hmat[[5], :].T @ Hmat[[5], :]) - E * (Hmat[[3], :].T @ Hmat[[3], :] + mu * Hmat[[3], :].T @ Hmat[[4], :]) - E * (Hmat[[4], :].T @ Hmat[[4], :] + mu * Hmat[[4], :].T @ Hmat[[3], :])) * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * np.linalg.det(J)
+            kloc += (-2 * G * (Hmat[[5], :].T @ Hmat[[5], :]) - E * (Hmat[[3], :].T @ Hmat[[3], :] + mu * Hmat[[5], :].T @ Hmat[[5], :]) - E * (Hmat[[4], :].T @ Hmat[[4], :] + mu * Hmat[[5], :].T @ Hmat[[5], :])) * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * np.linalg.det(J)
             gloc += -(Hmat[[2], :].T @ Hmat[[2], :]) * weightOfGaussPts[x_igp] * weightOfGaussPts[y_igp] * np.linalg.det(J)
     iv = np.array(sol.get_assembly_vector(DOF, n))
     GG[iv[:, None], iv] += gloc
@@ -61,14 +61,14 @@ print(tok - tik)
 # encastrate = np.where((np.isclose(nodalArray[2], ly)) | (np.isclose(nodalArray[2], 0)))[0]
 counter = 0
 encastrate = np.where((np.isclose(nodalArray[1], lx)) | (np.isclose(nodalArray[1], 0)))[0]
-iv = sol.get_assembly_vector(DOF, encastrate, required_dof=[0, 2, 3])
+iv = sol.get_assembly_vector(DOF, encastrate, required_dof=[0])
 for ibc in iv:
     counter += 1
     KG = sol.impose_boundary_condition(KG, ibc, 0)
     GG = sol.impose_boundary_condition(GG, ibc, 0)
 
 encastrate = np.where((np.isclose(nodalArray[2], 0)))[0]
-iv = sol.get_assembly_vector(DOF, encastrate, required_dof=[0, 1, 3])
+iv = sol.get_assembly_vector(DOF, encastrate, required_dof=[0])
 for ibc in iv:
     counter += 1
     KG = sol.impose_boundary_condition(KG, ibc, 0)
