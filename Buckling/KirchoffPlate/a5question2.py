@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import time
 plt.style.use('dark_background')
 
-
+# CASE 2
 H = 1/1000
 L = H * 100
 DIMENSION = 2

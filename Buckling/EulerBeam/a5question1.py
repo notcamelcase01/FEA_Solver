@@ -6,7 +6,7 @@ from parameters import E, L
 import keywords as param
 
 plt.style.use('dark_background')
-
+#CASE 1
 
 def get_height():
     """
