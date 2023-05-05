@@ -71,9 +71,8 @@ def get_node_points_coords(n, length, reqn=(0, 1)):
 def get_lagrange_interpolation_fn_1d(x, element_type):
     """
     :param x: gp
-    :param J: jaobian
     :param element_type: element type
-    :return:
+    :return: N L
     """
     xi_ = np.array([-1, 1])[:, None]
     if element_type == 2:

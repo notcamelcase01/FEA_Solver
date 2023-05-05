@@ -2,7 +2,7 @@ import numpy as np
 import solver_non_linear as sol
 import matplotlib.pyplot as plt
 
-
+tol = 1e-2
 f0 = 100
 Elasticity = 30 * 10 ** 6
 b = 0.01
@@ -18,7 +18,7 @@ nodePeElement = element_type ** DIMENSION
 wgp, egp = sol.init_gauss_points(3)
 x = sol.get_node_points_coords(numberOfNodes, a)
 icon = sol.get_connectivity_matrix(numberOfElements, element_type)
-u0 = np.ones((numberOfNodes, 1)) * 11
+u0 = np.ones((numberOfNodes, 1))
 f_app = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) * 0.1 * f0 * b
 for iter__ in range(10): #Force Increment
     KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
@@ -58,10 +58,7 @@ for iter__ in range(10): #Force Increment
         u  =  np.linalg.solve(KG, fg)
         delta_u = np.linalg.solve(T, r)
         u0 = u + delta_u
-        if (abs(np.linalg.norm(delta_u) / (np.linalg.norm(u0) + 0.00001))) < 10**(-6):
-            print(r"Convergence for step {p} in {d} iterations".format(p = iter__ + 1, d = iter_))
+        if (abs(np.linalg.norm(delta_u) / (np.linalg.norm(u0) + tol))) < tol:
             break
-fig, yy  = plt.subplots(1, 1, figsize=(12, 8))
-yy.plot(x, u0)
-print(u0)
+
 print("Displacement at the end of rod (x = a) where a = 0.1 is ", u0[-1][0])

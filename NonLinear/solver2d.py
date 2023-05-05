@@ -163,3 +163,21 @@ def get_2d_connectivity(nx, ny, lx, ly):
     icon[4, :] = icon[3, :] - 1
     icon = icon.transpose()
     return icon, node_array, np.meshgrid(x, y)
+
+
+def get_lagrange_shape_function(x, y, element_type=2):
+    xi = np.array((-1, 0, 1, 1, 1, 0, -1, -1, 0))
+    yi = np.array((-1, -1, -1, 0, 1, 1, 1, 0, 0))
+    seq = np.array(((-1, 1, 1, -1), (-1, -1, 1, 1)))
+    if element_type == 3:
+        N = ((1.5 * xi**2 - 1) * x**2 + 0.5 * xi * x + 1 - xi**2) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)
+        Nx = ((1.5 * xi**2 - 1) * x * 2 + 0.5 * xi) * ((1.5 * yi**2 - 1) * y**2 + 0.5 * yi * y + 1 - yi**2)
+        Ny = ((1.5 * xi**2 - 1) * x**2 + 0.5 * xi * x + 1 - xi**2) * ((1.5 * yi**2 - 1) * y * 2 + 0.5 * yi)
+    elif element_type == 2:
+        N = 0.25 * (1 + seq[0] * x) * (1 + seq[1] * y)
+        Nx = 0.25 * (seq[0] * (1 + seq[1] * y))
+        Ny = 0.25 * (seq[1] * (1 + seq[0] * x))
+    else:
+        raise Exception("Uhm, This is wendy's, we don't, more than 3 nodes here")
+    return N[:, None], Nx[:, None], Ny[:, None]
+
