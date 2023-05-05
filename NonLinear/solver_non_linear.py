@@ -68,7 +68,7 @@ def get_node_points_coords(n, length, reqn=(0, 1)):
     return x
 
 
-def get_lagrange_interpolation_fn_1d(x, J, element_type):
+def get_lagrange_interpolation_fn_1d(x, element_type):
     """
     :param x: gp
     :param J: jaobian
@@ -78,7 +78,7 @@ def get_lagrange_interpolation_fn_1d(x, J, element_type):
     xi_ = np.array([-1, 1])[:, None]
     if element_type == 2:
         N = (1 + xi_ * x) / 2
-        Nx = (xi_ /2) / J
+        Nx = (xi_ / 2)
     else:
         raise Exception("Sir this is wendy's")
     return N, Nx
