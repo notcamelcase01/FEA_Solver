@@ -28,7 +28,7 @@ while True:
         kloc, floc = sol.init_stiffness_force(element_type, DOF)
         tloc, rloc = sol.init_stiffness_force(element_type, DOF)
         for igp in range(len(wgp)):
-            N, B = sol.get_lagrange_interpolation_fn_1d(egp[igp], Jacobian, element_type)
+            N, B = sol.get_lagrange_interpolation_fn_1d(egp[igp], Jacobian)
             ugp = N.T @ ulo
             dugp = B.T @ ulo
             kloc += B @ B.T * (ugp + np.sqrt(2)) * wgp[igp] * Jacobian

@@ -2,8 +2,6 @@ import numpy as np
 import solver_non_linear as sol
 import matplotlib.pyplot as plt
 
-def get_b(y):
-    return 0.005 + 0.005 * y / 0.1
 
 f0 = 100
 Elasticity = 30 * 10 ** 6
@@ -14,18 +12,17 @@ Area = b * h
 element_type = 2
 DOF = 1
 DIMENSION = 1
-numberOfElements = 400
+numberOfElements = 10
 numberOfNodes = numberOfElements + 1
 nodePeElement = element_type ** DIMENSION
-wgp, egp = sol.init_gauss_points(2)
+wgp, egp = sol.init_gauss_points(3)
 x = sol.get_node_points_coords(numberOfNodes, a)
 icon = sol.get_connectivity_matrix(numberOfElements, element_type)
-u0 = np.ones((numberOfNodes, 1))
+u0 = np.ones((numberOfNodes, 1)) * 11
 f_app = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) * 0.1 * f0 * b
-for iter__ in range(1): #Force Increment
-    u0 = np.ones((numberOfNodes, 1))
+for iter__ in range(10): #Force Increment
     KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
-
+    T, r = sol.init_stiffness_force(numberOfNodes, DOF)
     for iter_ in range(100):
         for elm in range(numberOfElements):
             n = sol.get_node_from_element(icon, elm, element_type)
@@ -39,26 +36,32 @@ for iter__ in range(1): #Force Increment
             iv = np.array(sol.get_assembly_vector(DOF, n))
             uloc = u0[iv[:, None], 0]
             kloc, floc = sol.init_stiffness_force(nodePeElement, DOF)
+            tloc, rloc = sol.init_stiffness_force(nodePeElement, DOF)
             for igp in range(len(wgp)):
                N, B = sol.get_lagrange_interpolation_fn_1d(egp[igp], element_type)
                xx = N.T @ xloc
                B = B / Jacobian
                du = B.T @ uloc
-               Bnl =  B
+               Bnl =  B  *  0.5
                Bl = (B + du * B)
                E =  du + du ** 2 * 0.5
-               kloc += Elasticity * Area * (Bl @ Bl.T + E * Bnl @ Bnl.T) * wgp[igp] * Jacobian
-               floc += (N *  f_app[iter__] * np.sin(np.pi * xx / a) - Bl * E * Elasticity * Area) * Jacobian * wgp[igp]
+               kloc += Elasticity * Area * (Bl @ Bl.T) * wgp[igp] * Jacobian
+               tloc += Elasticity * Area *  (E * Bnl @ Bnl.T + Bl @ Bl.T) * Jacobian * wgp[igp]
+               rloc += (N *  f_app[iter__] * np.sin(np.pi * xx / a) - Bl * E * Elasticity * Area) * Jacobian * wgp[igp]
+               floc += (N *  f_app[iter__] * np.sin(np.pi * xx / a)) * Jacobian * wgp[igp]
             fg[iv[:, None], 0] += floc
             KG[iv[:, None], iv] += kloc
+            r[iv[:, None], 0] += rloc
+            T[iv[:, None], iv] += tloc
         KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
-        uN  =  np.linalg.solve(KG, fg)
-        if np.linalg.norm(np.abs(uN - u0), np.inf) / np.linalg.norm(np.abs(uN), np.inf) < 10 ** (-6):
-            print(r"{d} step convergence in {p} iteration".format(d = iter__ + 1, p = iter_))
+        T, r = sol.impose_boundary_condition(T, r, 0, 0)
+        u  =  np.linalg.solve(KG, fg)
+        delta_u = np.linalg.solve(T, r)
+        u0 = u + delta_u
+        if (abs(np.linalg.norm(delta_u) / (np.linalg.norm(u0) + 0.00001))) < 10**(-6):
+            print(r"Convergence for step {p} in {d} iterations".format(p = iter__ + 1, d = iter_))
             break
-        u0 = uN
-
 fig, yy  = plt.subplots(1, 1, figsize=(12, 8))
 yy.plot(x, u0)
+print(u0)
 print("Displacement at the end of rod (x = a) where a = 0.1 is ", u0[-1][0])
-plt.show()
