@@ -40,4 +40,3 @@ for iter_ in range(10):
     KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
     u0 = np.linalg.solve(KG, fg)
     print(u0[-1])
-
