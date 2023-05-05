@@ -23,7 +23,7 @@ f_app = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) * 0.1 * f0 * b
 for iter__ in range(10): #Force Increment
     KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
     T, r = sol.init_stiffness_force(numberOfNodes, DOF)
-    for iter_ in range(100):
+    for _ in range(100):
         for elm in range(numberOfElements):
             n = sol.get_node_from_element(icon, elm, element_type)
             xloc = []
