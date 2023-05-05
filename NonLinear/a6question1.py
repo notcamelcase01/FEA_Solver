@@ -18,10 +18,14 @@ nodePeElement = element_type ** DIMENSION
 wgp, egp = sol.init_gauss_points(3)
 x = sol.get_node_points_coords(numberOfNodes, a)
 icon = sol.get_connectivity_matrix(numberOfElements, element_type)
-u0 = np.ones((numberOfNodes, 1))
+u0 = np.zeros((numberOfNodes, 1))
 f_app = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) * 0.1 * f0 * b
 for iter__ in range(10): #Force Increment
     KG, fg = sol.init_stiffness_force(numberOfNodes, DOF)
+    """
+    I have done this tangent stiffness thing but this is not necessary since we can add increments directly in displacements 
+    and thats what I am doing so just ignore these terms, I was trying to draw parallels between newton raphson and this
+    """
     T, r = sol.init_stiffness_force(numberOfNodes, DOF)
     for _ in range(100):
         for elm in range(numberOfElements):
@@ -53,11 +57,15 @@ for iter__ in range(10): #Force Increment
             KG[iv[:, None], iv] += kloc
             r[iv[:, None], 0] += rloc
             T[iv[:, None], iv] += tloc
+        """
+        I have done this tangent stiffness thing but this is not necessary since we can add increments directly in displacements 
+        and thats what I am doing so just ignore these terms, I was trying to draw parallels between newton raphson and this
+        """
         KG, fg = sol.impose_boundary_condition(KG, fg, 0, 0)
         T, r = sol.impose_boundary_condition(T, r, 0, 0)
         u  =  np.linalg.solve(KG, fg)
         delta_u = np.linalg.solve(T, r)
-        u0 = u + delta_u
+        u0 = u0 + delta_u
         if (abs(np.linalg.norm(delta_u) / (np.linalg.norm(u0) + tol))) < tol:
             break
 
